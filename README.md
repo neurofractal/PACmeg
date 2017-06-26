@@ -2,6 +2,8 @@
 
 Scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data
 
+![Imgur](http://i.imgur.com/ZDCCXtd.png)
+
 ## Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.
 
 Please download the MEG data from [insert link to Figshare when available].
