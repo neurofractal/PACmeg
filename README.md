@@ -2,7 +2,7 @@
 
 Scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data
 
-![Imgur](http://i.imgur.com/ZDCCXtd.png)
+![Imgur](http://i.imgur.com/XkNWkZn.png)
 
 ## Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.
 
