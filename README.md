@@ -6,7 +6,9 @@ Written by [Robert Seymour](http://robertseymour.me), June 2017.
 
 ![Imgur](http://i.imgur.com/XkNWkZn.png)
 
-## The scripts correspond to the manuscript:
+## Please Note:
+
+These scripts correspond to the manuscript:
 
 **Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.**
 
