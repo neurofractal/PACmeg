@@ -13,17 +13,22 @@
 %
 % Written by Robert Seymour - May 2017
 %
+% Runnng time: 15 minutes (requires user to manually inspect trial
+% variances and enter the bad trial numbers - see bad_trial_indices.tsv)
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load computer-specific information
 restoredefaultpath;
-PAC_frontiers_dir;
+sensory_PAC;
 addpath(fieldtrip_dir);
 ft_defaults
 
-%% Specify Subject List
- subject = sort({'MP','GR','DS','EC','VS','LA','AE','SY','GW',...
-     'SW','DK','LH','KM','FL','AN'});
+% If you do not run these lines you will have to manually specify:
+% - subject = subject list
+% - data_dir = directory which contains the MEG & anatomical information
+% - scripts_dir = directory with ALL the scripts
+% - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
 for i = 1:length(subject)
     %% Prerequisites
@@ -33,12 +38,13 @@ for i = 1:length(subject)
     cd([scripts_dir '\' subject{i}]);
     
     % Specify location of the datafile
-    rawfile = [data_dir '\' 'rs_asd_' lower(subject{i}) '_aliens_quat_tsss.fif'];
+    rawfile = [data_dir '\' subject{i} '\meg\' subject{i} '_visualgrating-task_quat_tsss.fif'];
     % Creates log file
     diary(sprintf('log %s.out',subject{i}));
     c = datestr(clock); %time and date
     disp(sprintf('Running preprocessing script for subject{i} %s',subject{i}))
     disp(c)
+    
     %% Epoching & Filtering
     % Epoch the whole dataset into one continous dataset and apply
     % the appropriate filters

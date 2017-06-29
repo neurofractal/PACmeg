@@ -3,7 +3,7 @@
 % 2_get_source_power.m
 %
 % This script computes source-space power for baseline and grating periods
-% in the gamma-band and then the alpha-band.
+% in the gamma-band (40-60Hz) and then the alpha-band (8-13Hz).
 %
 % For source localisation, a 3D cortical mesh of 4002 vertices per 
 % hemisphere is used, which is created from Freesurfer and HCP scripts.
@@ -13,17 +13,21 @@
 %
 % Written by Robert Seymour February 2017
 %
+% Running Time: 15-20 mins
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load computer-specific information
 restoredefaultpath
-PAC_frontiers_dir;
+sensory_PAC;
 addpath(fieldtrip_dir);
 ft_defaults
 
-%% Subject List
-subject = sort({'RS','DB','MP','GR','DS','EC','VS','LA','AE','SY','GW',...
-    'SW','DK','LH','KM','FL','AN'});
+% If you do not run these lines you will have to manually specify:
+% - subject = subject list
+% - data_dir = directory which contains the MEG & anatomical information
+% - scripts_dir = directory with ALL the scripts
+% - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
 %% Arrays to hold source estimates for each subject
 sourcepre_all = [];
@@ -31,16 +35,16 @@ sourcepost_all = [];
 
 %% Pre-load the Conte69 Brain Template from the HCP
 conte69brain = ft_read_headshape({[scripts_dir ...
-    '/3d_mesh/' 'Q1-Q6_R440.L.midthickness.4k_fs_LR.surf.gii'],...
-    [scripts_dir '/3d_mesh/' 'Q1-Q6_R440.R.midthickness.4k_fs_LR.surf.gii']});
+     '\Q1-Q6_R440.L.midthickness.4k_fs_LR.surf.gii'],...
+    [scripts_dir  '\Q1-Q6_R440.R.midthickness.4k_fs_LR.surf.gii']});
 
 %% Start Loop
 for i=1:length(subject)
    
     %% Load variables required for source analysis
     load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']); % non-ICA'd data
-    load(sprintf('D:\\pilot\\%s\\visual\\sourceloc\\sens.mat',subject{i}));
-    load(sprintf('D:\\pilot\\%s\\visual\\sourceloc\\seg.mat',subject{i}));
+    load([data_dir '\' subject{i} '\anat\sens.mat']);
+    load([data_dir '\' subject{i} '\anat\seg.mat']);
     sens = ft_convert_units(sens,'m');
     seg = ft_convert_units(seg,'m');
     %% Set the current directory
@@ -53,10 +57,11 @@ for i=1:length(subject)
     data_clean_noICA = ft_preprocessing(cfg,data_clean_noICA);
     
     %% Load 3D 4k Cortical Mesh for L/R hemisphere & Concatenate
-    sourcespace = ft_read_headshape({[scripts_dir '/3d_mesh/Subject' ...
-        subject{i} '.L.midthickness.4k_fs_LR.surf.gii'],[scripts_dir...
-        '/3d_mesh/Subject' subject{i} '.R.midthickness.4k_fs_LR.surf.gii']});
+    sourcespace = ft_read_headshape({[data_dir '\' subject{i} '\anat\'...
+        subject{i} '.L.midthickness.4k_fs_LR.surf.gii'],[data_dir...
+        '\' subject{i} '\anat\' subject{i} '.R.midthickness.4k_fs_LR.surf.gii']});
     sourcespace = ft_convert_units(sourcespace,'m');
+    
     %% Make sure rank of the data is below 64
     
     % determine numcomponent by doing an eig on the covariance matrix
@@ -124,7 +129,7 @@ for i=1:length(subject)
     headmodel  = ft_prepare_headmodel(cfg, seg);
     
     % Load headshape
-    headshape = ft_read_headshape([data_dir '\' 'rs_asd_' lower(subject{i}) '_aliens_quat_tsss.fif']);
+    headshape = ft_read_headshape([data_dir '\' subject{i} '\meg\' subject{i} '_visualgrating-task_quat_tsss.fif']);
     headshape = ft_convert_units(headshape,'m');
     
     %% Create leadfields
@@ -183,10 +188,10 @@ sourcepre_avg = ft_sourcegrandaverage(cfg,sourcepre_all{:});
 %% Take Post-Grating Power from Baseline Power
 cfg = [];
 cfg.parameter = 'pow';
-cfg.operation = '((x1-x2)/x2)*100';
+cfg.operation = '((x1-x2)/x2)*100'; % calculate & change
 diff = ft_math(cfg,sourcepost_avg,sourcepre_avg);
 
-%% Plot on the Conte69 Brain (deosn't look very good)
+%% Plot on the Conte69 Brain (doesn't look very good)
 figure;ft_plot_mesh(conte69brain, 'vertexcolor', -diff.pow);colormap(hot);colorbar;
 
 %% Interpolate onto MNI template
@@ -207,10 +212,12 @@ cfg.filename = 'group_visual_gamma_grandavg';
 cfg.parameter = 'pow';
 ft_sourcewrite(cfg,diffint);
 
+% This corresponds to Figure 3A
+
 %% Export to connectome workbench (specfic to my computer)
 
-system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.L.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii_LEFT.shape.gii -trilinear')
-system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.R.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii_RIGHT.shape.gii -trilinear')
+%system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.L.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii_LEFT.shape.gii -trilinear')
+%system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.R.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_gamma_grandavg.nii_RIGHT.shape.gii -trilinear')
 
 
 
@@ -239,28 +246,26 @@ close all
 clc
 
 %% Load computer-specific information
-PAC_frontiers_dir;
+sensory_PAC;
 addpath(fieldtrip_dir);
 ft_defaults
-
-%% Subject List
-subject = sort({'RS','DB','MP','GR','DS','EC','VS','LA','AE','SY','GW',...
-    'SW','DK','LH','KM','FL','AN'});
 
 %% Arrays to hold source estimates for each subject
 sourcepre_all = [];
 sourcepost_all = [];
 
 %% Pre-load the Conte69 Brain Template from the HCP
-conte69brain = ft_read_headshape({[scripts_dir '/3d_mesh/' 'Q1-Q6_R440.L.midthickness.4k_fs_LR.surf.gii'],[scripts_dir '/3d_mesh/' 'Q1-Q6_R440.R.midthickness.4k_fs_LR.surf.gii']});
+conte69brain = ft_read_headshape({[scripts_dir ...
+     '\Q1-Q6_R440.L.midthickness.4k_fs_LR.surf.gii'],...
+    [scripts_dir  '\Q1-Q6_R440.R.midthickness.4k_fs_LR.surf.gii']});
 
 %% Start Loop
 for i=1:length(subject)
    
     %% Load variables required for source analysis
     load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']); % non-ICA'd data
-    load(sprintf('D:\\pilot\\%s\\visual\\sourceloc\\sens.mat',subject{i}));
-    load(sprintf('D:\\pilot\\%s\\visual\\sourceloc\\seg.mat',subject{i}));
+    load([data_dir '\' subject{i} '\anat\sens.mat']);
+    load([data_dir '\' subject{i} '\anat\seg.mat']);
     sens = ft_convert_units(sens,'m');
     seg = ft_convert_units(seg,'m');
     %% Set the current directory
@@ -273,8 +278,11 @@ for i=1:length(subject)
     data_clean_noICA = ft_preprocessing(cfg,data_clean_noICA);
     
     %% Load 3D 4k Cortical Mesh for L/R hemisphere & Concatenate
-    sourcespace = ft_read_headshape({[scripts_dir '/3d_mesh/Subject' subject{i} '.L.midthickness.4k_fs_LR.surf.gii'],[scripts_dir '/3d_mesh/Subject' subject{i} '.R.midthickness.4k_fs_LR.surf.gii']});
+    sourcespace = ft_read_headshape({[data_dir '\' subject{i} '\anat\'...
+        subject{i} '.L.midthickness.4k_fs_LR.surf.gii'],[data_dir...
+        '\' subject{i} '\anat\' subject{i} '.R.midthickness.4k_fs_LR.surf.gii']});
     sourcespace = ft_convert_units(sourcespace,'m');
+    
     %% Do your timelock analysis on the data & compute covariance
     
     % determine numcomponent by doing an eig on the covariance matrix
@@ -340,8 +348,8 @@ for i=1:length(subject)
     cfg.method = 'singleshell';
     headmodel  = ft_prepare_headmodel(cfg, seg);
     
-    % Load headshape
-    headshape = ft_read_headshape([data_dir '\' 'rs_asd_' lower(subject{i}) '_aliens_quat_tsss.fif']);
+        % Load headshape
+    headshape = ft_read_headshape([data_dir '\' subject{i} '\meg\' subject{i} '_visualgrating-task_quat_tsss.fif']);
     headshape = ft_convert_units(headshape,'m');
     
     %% Create leadfields
@@ -424,9 +432,11 @@ cfg.filename = 'group_visual_alpha_grandavg';
 cfg.parameter = 'pow';
 ft_sourcewrite(cfg,diffint);
 
+% This corresponds to Figure 3B
+
 %% Export to connectome workbench (specfic to my computer)
 
-system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.L.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii_LEFT.shape.gii -trilinear')
-system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.R.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii_RIGHT.shape.gii -trilinear')
+%system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.L.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii_LEFT.shape.gii -trilinear')
+%system('D:\Software\workbench\bin_windows64\wb_command -volume-to-surface-mapping D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii D:\Software\workbench\bin_windows64\Conte69_atlas-v2.LR.32k_fs_LR.wb\32k_ConteAtlas_v2\Conte69.R.midthickness.32k_fs_LR.surf.gii D:\scripts\PAC_for_frontiers\group_visual_alpha_grandavg.nii_RIGHT.shape.gii -trilinear')
 
 

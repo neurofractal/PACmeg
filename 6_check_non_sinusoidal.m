@@ -8,24 +8,28 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Load computer-specific information
 restoredefaultpath
-PAC_frontiers_dir;
-addpath(scripts_dir);
+sensory_PAC;
 addpath(fieldtrip_dir);
 ft_defaults
 
-subject = sort({'RS','DB','MP','GR','DS','EC','VS','LA','AE',...
-    'SW','DK','LH','KM','AN','GW','SY'});
+% If you do not run these lines you will have to manually specify:
+% - subject = subject list
+% - data_dir = directory which contains the MEG & anatomical information
+% - scripts_dir = directory with ALL the scripts
+% - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
 %% Concatenate all VE data into single variable
 VE_V1_concat = [];
 
-% Get all data concatenated
+% Start loop for all subjects
 for sub = 1:length(subject)
 
     % Load in data
     load([scripts_dir '\' subject{sub} '\VE_V1.mat']);
     
+    % Append
     if sub == 1
         VE_V1_concat = VE_V1;
     else
@@ -36,8 +40,9 @@ end
 
 %% Calculate the Rise Time: Decay Time for Gratig & Baseline Periods
 
-stats_all = [];
-p_all = []; count = 1;
+stats_all = []; % Variable to hold the output from the t-test
+p_all = []; % Variable to hold the p-value from the t-test
+count = 1; % For use wthin the loop
 figure; % Create figure
 
 % Start loop for phases 7-13Hz
@@ -61,7 +66,7 @@ for phase = 7:13
     [h,p,ci,stats] = ttest(ratios_post_grating,ratios_pre_grating);
     title(['Phase Frequency = ' num2str(phase)  ' ; p = ' num2str(p)]);
     
-    % Add this to array for all phases
+    % Add this to the varibles outsode the loop for all phases
     stats_all{count} = stats;
     p_all(count) = p;
     count = count+1;
