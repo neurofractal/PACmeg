@@ -1,6 +1,6 @@
 # sensory_PAC
 
-Scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data.
+MATLAB scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data.
 
 Written by [Robert Seymour](http://robertseymour.me), June 2017.
 
