@@ -4,7 +4,7 @@ Scripts for detecting and validating phase amplitude coupling (PAC) in electroph
 
 ![Imgur](http://i.imgur.com/XkNWkZn.png)
 
-## These scripts correspond to the manuscript
+## These scripts correspond to the manuscript:
 
 **Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.**
 
@@ -29,9 +29,9 @@ Please download the MEG and anatomical data from [Figshare](https://figshare.com
 The following PAC functions can also be used in isolation, for data arranged in a Fieldtrip structure: 
 
 * **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI.m)**
-* **[calc_MI_ozkurt](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_ozkurt.m) **
-* **[calc_MI_canolty](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_canolty.m) **
-* **[calc_MI_PLV](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_PLV.m) **
+* **[calc_MI_ozkurt](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_ozkurt.m)**
+* **[calc_MI_canolty](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_canolty.m)**
+* **[calc_MI_PLV](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_PLV.m)**
 
 However, please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).
 
