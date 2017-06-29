@@ -1,10 +1,12 @@
 # sensory_PAC
 
-Scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data
+Scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data.
+
+Written by [Robert Seymour](http://robertseymour.me), June 2017.
 
 ![Imgur](http://i.imgur.com/XkNWkZn.png)
 
-## These scripts correspond to the manuscript:
+## The scripts correspond to the manuscript:
 
 **Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.**
 
@@ -34,5 +36,7 @@ The following PAC functions can also be used in isolation, for data arranged in 
 * **[calc_MI_PLV](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_PLV.m)**
 
 However, please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).
+
+---
 
 For more information/queries please raise an ISSUE within Github or email me: robbyseymour [at] gmail.com
