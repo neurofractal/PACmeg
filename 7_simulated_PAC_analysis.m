@@ -6,20 +6,29 @@
 % algorithms are then applied to determine how well they recover this
 % coupling.
 %
-% The coupling between 10Hz and 60Hz is then calculated as a function of
+% PAC between 10Hz and 60Hz is then calculated as a function of
 % data length, to determine how many seconds of data are needed for 
-% reliable estimates of PAC.
+% reliable estimates.
 %
 % N.B. Due to the use of random noise values, the resulting plots may vary
 % slightly from the Seymour, Kessler & Rippon (2017) manuscript.
+%
+% Written by: Robert Seymour, June 2017
+%
+% Runtime: 10 minutes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load computer-specific information
 restoredefaultpath
-PAC_frontiers_dir;
+sensory_PAC;
 addpath(fieldtrip_dir);
 ft_defaults
+
+% If you do not run these lines you will have to manually specify:
+% - data_dir = directory which contains the MEG & anatomical information
+% - scripts_dir = directory with ALL the scripts
+% - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
 %% Show an example of the Synthesised PAC
 [s_final, snr] = synthesize_pac(2);
@@ -28,14 +37,14 @@ figure; plot(s_final(1:1000));
 %% Create 64 different SNRs
 
 for i = 1:64
-    snr_array(i) = (3*rand(1,1));
+    snr_array(i) = (3*rand(1,1)); % Noise value varies from 0-3
 end
 
 %% Create Fieldtrip-like Virtual Electrode with 64 trials of synthesised PAC
 VE_PAC = [];
 VE_PAC.label = {'PAC'};
 for i = 1:64 % for every trial
-    % syntheise PAC using a different noise value
+    % syntheise PAC using a variable noise value
     [s_final, snr] = synthesize_pac(snr_array(i));
     VE_PAC.trial{1,i} = s_final(1:10000); % Put simulated PAC into Fieldtrip VE
     VE_PAC.time{1,i} = 0.001:0.001:10; % Create 10s worth of PAC
@@ -49,7 +58,7 @@ ozkurt_PAC = calc_MI_ozkurt(VE_PAC,[0.3 1.5],[7 13],[34 100],'no');
 figure; 
 pcolor([7:1:13],[34:2:100],ozkurt_PAC); shading(gca,'interp');
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('MLV-MI');
+title('MVL-MI');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',15); colorbar;
 

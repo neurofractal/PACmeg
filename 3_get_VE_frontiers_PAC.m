@@ -1,35 +1,51 @@
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This script computes a virtual electrode time-series from area V1, using
-% visual grating data and the HCP-MMP 1.0 atlas.
+% This script computes a virtual electrode time-series from area V1. Source
+% analysis is performed across all vertices of the 3D cortical mesh. 
+% Vertex locations within visual area V1 are then defined using the 
+% HCP-MMP 1.0 atlas.
 %
-% Written by Robert Seymour February 2017
+% The spatial filters from these vertices are concatenated, multiplied by
+% the sensor-level covariance mstrix and a PCA is performed to extract a
+% single V1 filter. This is multipled by the sensor-level trial data to
+% generate VE_V1.mat. 
+%
+% Please note: It is also perfectly viable to use a volumetric atlas (e.g.
+% AAL) to generate this V1 virtual electrode.
+%
+% Output: VE_V1.mat . This is saved in the sensory_PAC/sub-XX/ directory
+%
+% Written by Robert Seymour - June 2017
+%
+% Run-time: 15-20 minutes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load computer-specific information
 restoredefaultpath
-PAC_frontiers_dir;
+sensory_PAC;
 addpath(fieldtrip_dir);
 ft_defaults
 
-%% Subject List
-subject = sort({'RS','DB','MP','GR','DS','EC','VS','LA','AE','SY','GW',...
-    'SW','DK','LH','KM','AN'});
+% If you do not run these lines you will have to manually specify:
+% - subject = subject list
+% - data_dir = directory which contains the MEG & anatomical information
+% - scripts_dir = directory with ALL the scripts
+% - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
  %% Preload the HCP atlas
-    % Here we are using the 4k HCP atlas mesh to define visual ROIs 
-    % from the subject-specific 4k cortical mesh
-    load([scripts_dir '\' 'atlas_MSMAll_4k.mat']);
-    atlas = ft_convert_units(atlas,'m');
+ % Here we are using the 4k HCP atlas mesh to define visual ROIs
+ % from the subject-specific 4k cortical mesh
+ load([scripts_dir '\' 'atlas_MSMAll_4k.mat']);
+ atlas = ft_convert_units(atlas,'m');
 
 %% Start Loop
 for i=1:length(subject)
    
     %% Load variables required for source analysis
     load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']); % non-ICA'd data
-    load(sprintf('D:\\pilot\\%s\\visual\\sourceloc\\sens.mat',subject{i}));
-    load(sprintf('D:\\pilot\\%s\\visual\\sourceloc\\seg.mat',subject{i}));
+    load([data_dir '\' subject{i} '\anat\sens.mat']);
+    load([data_dir '\' subject{i} '\anat\seg.mat']);
     sens = ft_convert_units(sens,'m');
     seg = ft_convert_units(seg,'m');
     %% Set the current directory
@@ -42,7 +58,9 @@ for i=1:length(subject)
     data_clean_noICA = ft_preprocessing(cfg,data_clean_noICA);
     
     %% Load 3D 4k Cortical Mesh for L/R hemisphere & Concatenate
-    sourcespace = ft_read_headshape({[scripts_dir '/3d_mesh/Subject' subject{i} '.L.midthickness.4k_fs_LR.surf.gii'],[scripts_dir '/3d_mesh/Subject' subject{i} '.R.midthickness.4k_fs_LR.surf.gii']});
+    sourcespace = ft_read_headshape({[data_dir '\' subject{i} '\anat\'...
+        subject{i} '.L.midthickness.4k_fs_LR.surf.gii'],[data_dir...
+        '\' subject{i} '\anat\' subject{i} '.R.midthickness.4k_fs_LR.surf.gii']});
     sourcespace = ft_convert_units(sourcespace,'m');
     
     %% Do your timelock analysis on the data & compute covariance
@@ -92,7 +110,7 @@ for i=1:length(subject)
     headmodel  = ft_prepare_headmodel(cfg, seg);
     
     % Load headshape
-    headshape = ft_read_headshape([data_dir '\' 'rs_asd_' lower(subject{i}) '_aliens_quat_tsss.fif']);
+    headshape = ft_read_headshape([data_dir '\' subject{i} '\meg\' subject{i} '_visualgrating-task_quat_tsss.fif']);
     headshape = ft_convert_units(headshape,'m');
     
     %% Create leadfields
