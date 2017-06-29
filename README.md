@@ -12,6 +12,17 @@ Written by [Robert Seymour](http://robertseymour.me), June 2017.
 
 Please download the MEG and anatomical data from [Figshare](https://figshare.com/projects/The_Detection_of_Phase_Amplitude_Coupling_During_Sensory_Processing/22762).
 
+Scripts can be easily adapted for your computer by modifying the sensory_PAC.m script:
+
+```matlab
+data_dir = 'path_to_data';
+scripts_dir = 'path_to_scripts';
+fieldtrip_dir = 'path_to_fieldtrip';
+subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
+    'sub-08','sub-09','sub-10','sub-11','sub-12','sub-13','sub-14',...
+    'sub-15','sub-16'};
+```
+
 ## Analysis should be performed in the following order:
 
 * [1_preprocessing_elektra_frontiers_PAC.m](https://github.com/neurofractal/sensory_PAC/blob/master/1_preprocessing_elektra_frontiers_PAC.m) = this script performs simple preprocessing steps and removes bad trials
