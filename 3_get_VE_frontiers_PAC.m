@@ -14,11 +14,11 @@
 % Please note: It is also perfectly viable to use a volumetric atlas (e.g.
 % AAL) to generate this V1 virtual electrode.
 %
-% Output: VE_V1.mat . This is saved in the sensory_PAC/sub-XX/ directory
+% Output: VE_V1.mat. This is saved in the sensory_PAC/sub-XX/ directory
 %
 % Written by Robert Seymour - June 2017
 %
-% Run-time: 15-20 minutes
+% Running-time: 15-20 minutes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load computer-specific information

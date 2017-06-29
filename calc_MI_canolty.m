@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function to calculate a comodulogram of Modulation Index (MI) values
-% from Fieldtrip data using the metric from (Canolty et al., 2006)
+% from Fieldtrip data using the metric from Canolty et al., (2006)
 %
 % Inputs: 
 % - virtsens = MEG data (1 channel)
@@ -10,7 +10,9 @@
 % - diag = 'yes' or 'no' to turn on or off diagrams during computation
 %
 % For details of the PAC method go to: 
+% http://science.sciencemag.org/content/313/5793/1626.long
 %
+% Written by Robert Seymour (Aston Brain Centre)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [MI_matrix] = calc_MI_canolty(virtsens,toi,phase,amp,diag)

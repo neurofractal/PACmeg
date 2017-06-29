@@ -11,6 +11,7 @@
 %
 % For details of the PAC method go to: http://jn.physiology.org/content/104/2/1195.short
 %
+% Written by: Robert Seymour - Aston Brain Centre
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [MI_matrix] = calc_MI(virtsens,toi,phase,amp,diag)

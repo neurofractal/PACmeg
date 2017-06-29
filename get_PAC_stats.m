@@ -1,21 +1,31 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This scripts performs statistical analyis on the matrix of modulation 
-% index (MI) values computed for PAC analysis on RS alien data.
+% This function performs statistical analyis on the matrix of modulation 
+% index (MI) values computed for PAC analysis.
 %
-% The script loads matrix_post (grating) adds the necessary info to make 
-% into a FT data structure and adds to a meta-matrix. This is repeated for
-% the matrix_pre (grating) data computed earlier.
+% The script loads the comodulogram and adds the necessary info to make 
+% into a FT data structure.
 %
 % Group statistics are then computed using cluster-based permutation tests 
 % based on the Montercarlo method (Maris & Oostenveld, 2007).
-
+%
+% Inputs:
+% - PAC_name1 = name of the first comdoulogram (specific to my data - can
+% be changed)
+% - PAC_name2 = name of the second comodulogram (specific to my data - can
+% be changed)
+% - phase = phase range
+% - amp = amplitude range
+% - subject = subject list
+% - scripts_dir = where the data & scripts are stored
+%
+% Outputs:
+% - stat = statistical output
+%
 % Written by Robert Seymour (ABC) - January 2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [stat] = get_PAC_stats(PAC_name1,PAC_name2,phase,amp,subject,scripts_dir)
-
-
 
 amp_list = [amp(1):2:amp(2)]; phase_list = [phase(1):1:phase(2)];
 
@@ -93,8 +103,8 @@ diff_MI = ft_math(cfg,post_MI,pre_MI)
 
 cfg = [];
 cfg.zlim = 'maxabs';
-cfg.ylim = [34 100];
-cfg.xlim    = [7 13];
+cfg.ylim = amp;
+cfg.xlim    = phase;
 ft_singleplotTFR(cfg,diff_MI); colormap(jet);
 
 %% Display results of stats (more work needed)
@@ -103,8 +113,6 @@ cfg.parameter = 'stat';
 cfg.maskparameter = 'mask';
 cfg.maskstyle     = 'outline';
 cfg.zlim = 'maxabs';
-cfg.ylim = [30 100];
-cfg.xlim    = [7 13];
 fig = figure; 
 ft_singleplotTFR(cfg,stat); colormap('jet');
 xlabel('Phase (Hz)'); ylabel('Amplitude (Hz)');

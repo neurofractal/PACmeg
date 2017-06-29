@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function to calculate a comodulogram of Modulation Index (MI) values
-% from Fieldtrip data using the metric from Cohen et al., (2008)
+% from Fieldtrip data using the PLV metric from Cohen et al., (2008)
 %
 % Inputs: 
 % - virtsens = MEG data (1 channel)
@@ -8,6 +8,11 @@
 % - phases of interest e.g. [4 22] currently increasing in 1Hz steps
 % - amplitudes of interest e.g. [30 80] currently increasing in 2Hz steps
 % - diag = 'yes' or 'no' to turn on or off diagrams during computation
+%
+% For details of the method please see:
+% http://www.sciencedirect.com/science/article/pii/S0165027007005237
+%
+% Written by Robert Seymour (Aston Brain Centre)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

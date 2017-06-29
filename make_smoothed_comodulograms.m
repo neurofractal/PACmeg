@@ -5,8 +5,6 @@ stats_reshaped = squeeze(stat.stat);
 mask_reshaped = squeeze(stat.mask);
 v = [1];
 
-
-
 % Create the figure
 figure('color', 'w');
 pcolor(phase(1):1:phase(2),amp(1):2:amp(2),stats_reshaped); % colormap
