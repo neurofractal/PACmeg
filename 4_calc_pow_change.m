@@ -75,6 +75,6 @@ plot([1:1:100],average_change,'k','LineWidth',6);
 ylabel('% Power Change');
 xlabel('Frequency (Hz)');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',15);
+set(gca,'FontSize',20);
 set(gcf, 'Color', 'w');
 
