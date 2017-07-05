@@ -41,6 +41,8 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
 
 * [7_simulated_PAC_analysis.m](https://github.com/neurofractal/sensory_PAC/blob/master/7_simulated_PAC_analysis.m) = this script simulates PAC, checks for the detection of this coupling using three approaches, and investigates how much data is needed for reliable PAC estimates.
 
+## PAC Functions
+
 The following PAC functions can also be used in isolation, for data arranged in a Fieldtrip structure: 
 
 * **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI.m)**
