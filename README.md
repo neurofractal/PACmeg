@@ -45,7 +45,7 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
 
 The following PAC functions can also be used in isolation, for data arranged in a Fieldtrip structure: 
 
-* **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI.m)**
+* **[calc_MI_tort](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_tort.m)**
 * **[calc_MI_ozkurt](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_ozkurt.m)**
 * **[calc_MI_canolty](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_canolty.m)**
 * **[calc_MI_PLV](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_PLV.m)**
