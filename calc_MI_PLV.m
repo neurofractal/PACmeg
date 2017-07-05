@@ -2,12 +2,13 @@
 % Function to calculate a comodulogram of Modulation Index (MI) values
 % from Fieldtrip data using the PLV metric from Cohen et al., (2008)
 %
-% Inputs: 
+% Inputs:
 % - virtsens = MEG data (1 channel)
 % - toi = times of interest in seconds e.g. [0.3 1.5]
 % - phases of interest e.g. [4 22] currently increasing in 1Hz steps
 % - amplitudes of interest e.g. [30 80] currently increasing in 2Hz steps
 % - diag = 'yes' or 'no' to turn on or off diagrams during computation
+% - surrogates = 'yes' or 'no' to turn on or off surrogates during computation
 %
 % For details of the method please see:
 % http://www.sciencedirect.com/science/article/pii/S0165027007005237
@@ -16,7 +17,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [MI_matrix] = calc_MI_PLV(virtsens,toi,phase,amp,diag)
+function [MI_matrix] = calc_MI_PLV(virtsens,toi,phase,amp,diag,surrogates)
 
 if diag == 'no'
     disp('NOT producing any images during the computation of MI')
@@ -33,13 +34,13 @@ clear phase_length amp_length
 row1 = 1;
 row2 = 1;
 
-for k = phase(1):1:phase(2) 
-    for p = amp(1):2:amp(2) 
+for k = phase(1):1:phase(2)
+    for p = amp(1):2:amp(2)
         %% Bandpass filter individual trials usign a two-way Butterworth Filter
-     
+        
         % Specifiy bandwith = +- 1/3 of center frequency
         Af1 = round(p -(p/2.5)); Af2 = round(p +(p/2.5));
-         
+        
         % Filter data at phase frequency using Butterworth filter
         cfg = [];
         cfg.showcallinfo = 'no';
@@ -55,8 +56,8 @@ for k = phase(1):1:phase(2)
         cfg.bpfreq = [Af1 Af2];
         cfg.hilbert = 'abs';
         [virtsens_amp] = ft_preprocessing(cfg, virtsens);
-
-         % Cut out window of interest (phase) - should exlude phase-locked
+        
+        % Cut out window of interest (phase) - should exlude phase-locked
         % responses (e.g. ERPs)
         cfg = [];
         cfg.toilim = toi; %specfied in function calls
@@ -66,7 +67,7 @@ for k = phase(1):1:phase(2)
         
         % Variable to hold MI for all trials
         MI_comb = [];
-
+        
         
         % For each trial...
         for trial_num = 1:length(virtsens.trial)
@@ -76,7 +77,7 @@ for k = phase(1):1:phase(2)
             Amp= post_grating_amp.trial{1, trial_num}; % getting the amplitude envelope
             
             % Apply PLV algorith, from Cohen et al., (2008)
-            amp_phase = angle(hilbert(detrend(Amp))); 
+            amp_phase = angle(hilbert(detrend(Amp)));
             MI = abs(mean(exp(1i*(Phase-amp_phase))));
             
             % Add this value to all other all other values
@@ -84,11 +85,45 @@ for k = phase(1):1:phase(2)
             
         end
         
-        % Calculate average MI over trials
-        MI_comb = mean(MI_comb);
+        if strcmp(surrogates, 'yes')
+            
+            % Variable to surrogate MI
+            MI_surr = [];
+            
+            % For each surrogate (surrently hard-coded for 200, could be changed)...
+            for surr = 1:200
+                % Get 2 random trial numbers
+                trial_num = randperm(length(post_grating_phase.trialinfo),2);
+                
+                % Extract phase and amp info using hilbert transform
+                % But for different trials
+                Phase= post_grating_phase.trial{1, trial_num(1)}(randperm(length(post_grating_phase.trial{1,trial_num(1)}))); % getting the phase
+                Amp = post_grating_amp.trial{1,trial_num(2)};
+                
+                % Apply PLV algorith, from Cohen et al., (2008)
+                amp_phase = angle(hilbert(detrend(Amp)));
+                MI = abs(mean(exp(1i*(Phase-amp_phase))));
+                
+                % Add this value to all other all other values
+                MI_surr(surr) = MI;
+
+            end
+            
+            disp('200 surrogates computed');
+            
+            % Calculate average MI over trials
+            MI_raw = mean(MI_comb);
+            
+            % Subtract the mean of the surrogaates from the actual PAC
+            % value
+            MI_raw = MI_raw-mean(MI_surr);
+            
+        else
+            MI_raw = mean(MI_comb);
+        end
         
         % Add to Matrix
-        MI_matrix(row1,row2) = MI_comb;
+        MI_matrix(row1,row2) = MI_raw;
         
         % Show progress of the comodulogram
         if strcmp(diag, 'yes')
@@ -104,7 +139,7 @@ for k = phase(1):1:phase(2)
         % Go to next Amplitude
         row1 = row1 + 1;
         
-        disp(sprintf('Phase: %d Amplitude: %d  MI: %d',k,p,MI_comb));
+        disp(sprintf('Phase: %d Amplitude: %d  MI: %d',k,p,MI_raw));
     end
     % Go to next Phase
     row1 = 1;

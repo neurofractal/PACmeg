@@ -2,20 +2,21 @@
 % Function to calculate a comodulogram of Modulation Index (MI) values
 % from Fieldtrip data using the metric from Canolty et al., (2006)
 %
-% Inputs: 
+% Inputs:
 % - virtsens = MEG data (1 channel)
 % - toi = times of interest in seconds e.g. [0.3 1.5]
 % - phases of interest e.g. [4 22] currently increasing in 1Hz steps
 % - amplitudes of interest e.g. [30 80] currently increasing in 2Hz steps
 % - diag = 'yes' or 'no' to turn on or off diagrams during computation
+% - surrogates = 'yes' or 'no' to turn on or off surrogates during computation
 %
-% For details of the PAC method go to: 
+% For details of the PAC method go to:
 % http://science.sciencemag.org/content/313/5793/1626.long
 %
 % Written by Robert Seymour (Aston Brain Centre)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [MI_matrix] = calc_MI_canolty(virtsens,toi,phase,amp,diag)
+function [MI_matrix] = calc_MI_canolty(virtsens,toi,phase,amp,diag,surrogates)
 
 if diag == 'no'
     disp('NOT producing any images during the computation of MI')
@@ -32,13 +33,13 @@ clear phase_length amp_length
 row1 = 1;
 row2 = 1;
 
-for k = phase(1):1:phase(2) 
-    for p = amp(1):2:amp(2) 
+for k = phase(1):1:phase(2)
+    for p = amp(1):2:amp(2)
         %% Bandpass filter individual trials usign a two-way Butterworth Filter
-     
+        
         % Specifiy bandwith = +- 1/2.5 of center frequency
         Af1 = round(p -(p/2.5)); Af2 = round(p +(p/2.5));
-         
+        
         % Filter data at phase frequency using Butterworth filter
         cfg = [];
         cfg.showcallinfo = 'no';
@@ -54,8 +55,8 @@ for k = phase(1):1:phase(2)
         cfg.bpfreq = [Af1 Af2];
         cfg.hilbert = 'abs';
         [virtsens_amp] = ft_preprocessing(cfg, virtsens);
-
-         % Cut out window of interest (phase) - should exlude phase-locked
+        
+        % Cut out window of interest (phase) - should exlude phase-locked
         % responses (e.g. ERPs)
         cfg = [];
         cfg.toilim = toi; %specfied in function calls
@@ -79,14 +80,48 @@ for k = phase(1):1:phase(2)
             
             % Add this value to all other all other values
             MI_comb(trial_num) = MI;
-
+            
         end
         
-        % Calculate average MI over trials
-        MI_comb = mean(MI_comb);
+        if strcmp(surrogates, 'yes')
+            
+            % Variable to surrogate MI
+            MI_surr = [];
+            
+            % For each surrogate (surrently hard-coded for 200, could be changed)...
+            for surr = 1:200
+                % Get 2 random trial numbers
+                trial_num = randperm(length(post_grating_phase.trialinfo),2);
+                
+                % Extract phase and amp info using hilbert transform
+                % But for different trials & phase shifted
+                Phase= post_grating_phase.trial{1, trial_num(1)}(randperm(length(post_grating_phase.trial{1,trial_num(1)}))); % getting the phase
+                Amp = post_grating_amp.trial{1,trial_num(2)};
+                
+                % Canolty et al., 2006 algorithm
+                z = Amp.*exp(1i*Phase); % Get complex valued signal
+                MI = abs(mean(z));
+                
+                % Add this value to all other all other values
+                MI_surr(surr) = MI;
+                
+            end
+            
+            disp('200 surrogates computed');
+            
+            % Calculate average MI over trials
+            MI_raw = mean(MI_comb);
+            
+            % Subtract the mean of the surrogaates from the actual PAC
+            % value
+            MI_raw = MI_raw-mean(MI_surr);
+            
+        else
+            MI_raw = mean(MI_comb);
+        end
         
-        % Add to Comodulogram
-        MI_matrix(row1,row2) = MI_comb;
+        % Add to Matrix
+        MI_matrix(row1,row2) = MI_raw;
         
         % Show progress of the comodulogram
         if strcmp(diag, 'yes')
@@ -102,7 +137,7 @@ for k = phase(1):1:phase(2)
         % Go to next Amplitude
         row1 = row1 + 1;
         
-        disp(sprintf('Phase: %d Amplitude: %d  MI: %d',k,p,MI_comb));
+        disp(sprintf('Phase: %d Amplitude: %d  MI: %d',k,p,MI_raw));
     end
     % Go to next Phase
     row1 = 1;
