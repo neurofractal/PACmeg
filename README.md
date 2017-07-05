@@ -51,7 +51,10 @@ The following PAC functions can also be used in isolation, for data arranged in 
 Example use:
 
 ```matlab
-% To produce a PAC comodulogram on a V1 virtual electrode using the Tort et al., (2010) approach, 0.3-1.5s post-stimulus onset between 7-13Hz phase and 34-100Hz amplitude, normalised by surrogate data:
+
+% To produce a PAC comodulogram on a V1 virtual electrode using the 
+% Tort et al., (2010) approach, 0.3-1.5s post-stimulus onset between
+% 7-13Hz phase and 34-100Hz amplitude, normalised by surrogate data:
 
 [MI_matrix] = calc_MI_tort(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes')
 
