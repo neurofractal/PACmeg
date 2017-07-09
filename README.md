@@ -2,7 +2,7 @@
 
 MATLAB scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data.
 
-Written by [Robert Seymour](http://robertseymour.me), June 2017.
+Written and maintained by [Robert Seymour](http://robertseymour.me), June 2017.
 
 ![Imgur](http://i.imgur.com/XkNWkZn.png)
 
@@ -41,12 +41,26 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
 
 * [7_simulated_PAC_analysis.m](https://github.com/neurofractal/sensory_PAC/blob/master/7_simulated_PAC_analysis.m) = this script simulates PAC, checks for the detection of this coupling using three approaches, and investigates how much data is needed for reliable PAC estimates.
 
+## PAC Functions
+
 The following PAC functions can also be used in isolation, for data arranged in a Fieldtrip structure: 
 
-* **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI.m)**
+* **[calc_MI_tort](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_tort.m)**
 * **[calc_MI_ozkurt](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_ozkurt.m)**
 * **[calc_MI_canolty](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_canolty.m)**
 * **[calc_MI_PLV](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_PLV.m)**
+
+Example use:
+
+```matlab
+
+% To produce a PAC comodulogram on a V1 virtual electrode using the 
+% Tort et al., (2010) approach, 0.3-1.5s post-stimulus onset between
+% 7-13Hz phase and 34-100Hz amplitude, normalised by surrogate data:
+
+[MI_matrix] = calc_MI_tort(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes')
+
+```
 
 However, please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).
 
