@@ -25,7 +25,7 @@
 % Written by Robert Seymour (ABC) - January 2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [stat] = get_PAC_stats(PAC_name1,PAC_name2,phase,amp,subject,scripts_dir)
+function [stat] = get_PAC_stats(PAC_name1,PAC_name2,phase,amp,subject,scripts_dir,surr)
 
 amp_list = [amp(1):2:amp(2)]; phase_list = [phase(1):1:phase(2)];
 
@@ -41,7 +41,11 @@ for i =1:length(subject)
     MI_post.dimord = 'chan_freq_time';
     MI_post.freq = amp_list;
     MI_post.time = phase_list;
-    MI_post.powspctrm = matrix_post;
+    if surr == 1
+        MI_post.powspctrm = matrix_post_surrogates;
+    else
+        MI_post.powspctrm = matrix_post;
+    end
     MI_post.powspctrm = reshape(MI_post.powspctrm,[1,length(amp_list),length(phase_list)]);
     % Add to meta-matrix
     grandavgA{i} = MI_post;
@@ -61,7 +65,11 @@ for i =1:length(subject)
     MI_pre.dimord = 'chan_freq_time';
     MI_pre.freq = amp_list;
     MI_pre.time = phase_list;
-    MI_pre.powspctrm = [matrix_pre];
+    if surr == 1
+        MI_pre.powspctrm = matrix_pre_surrogates;
+    else
+        MI_pre.powspctrm = matrix_pre;
+    end
     MI_pre.powspctrm = reshape(MI_pre.powspctrm,[1,length(amp_list),length(phase_list)]);
     % Add to meta-matrix
     grandavgB{i} = MI_pre;
