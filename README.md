@@ -1,18 +1,18 @@
 # sensory_PAC
 
-MATLAB scripts for detecting and validating phase amplitude coupling (PAC) in electrophysiological data.
+MATLAB scripts for detecting and validating **phase amplitude coupling (PAC)** in electrophysiological data.
 
-Written and maintained by [Robert Seymour](http://robertseymour.me), June 2017.
+Written and maintained by **[Robert Seymour](http://robertseymour.me)**, June 2017.
 
-![Imgur](http://i.imgur.com/XkNWkZn.png)
+![sensory_PAC](https://github.com/neurofractal/sensory_PAC/blob/master/figures_and_results/PAC_figure4-1.jpg)
 
-## Please Note:
-
-These scripts correspond to the manuscript:
+## Manuscript
 
 **Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.**
 
-Please download the MEG and anatomical data from [Figshare](https://figshare.com/projects/The_Detection_of_Phase_Amplitude_Coupling_During_Sensory_Processing/22762).
+## Data Sharing
+
+Please download the MEG and anatomical data from [Figshare](https://figshare.com/collections/The_Detection_of_Phase_Amplitude_Coupling_During_Sensory_Processing/3819106).
 
 Scripts can be easily adapted for your computer by modifying the sensory_PAC.m script:
 
@@ -41,24 +41,43 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
 
 * [7_simulated_PAC_analysis.m](https://github.com/neurofractal/sensory_PAC/blob/master/7_simulated_PAC_analysis.m) = this script simulates PAC, checks for the detection of this coupling using three approaches, and investigates how much data is needed for reliable PAC estimates.
 
-## PAC Functions
+## PAC Function
 
-The following PAC functions can also be used in isolation, for data arranged in a Fieldtrip structure: 
+The calc_MI function can be used in isolation, for data arranged in a Fieldtrip structure: 
 
-* **[calc_MI_tort](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_tort.m)**
-* **[calc_MI_ozkurt](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_ozkurt.m)**
-* **[calc_MI_canolty](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_canolty.m)**
-* **[calc_MI_PLV](https://github.com/neurofractal/sensory_PAC/blob/master/calc_MI_PLV.m)**
+* **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/functions/calc_MI.m)**
+
+```matlab
+
+function [MI_matrix_raw,MI_matrix_surr] = calc_MI(virtsens,toi,phase,amp,diag,surrogates,approach)
+
+% Inputs:
+% - virtsens = MEG data (1 channel)
+% - toi = times of interest in seconds e.g. [0.3 1.5]
+% - phases of interest e.g. [4 22] currently increasing in 1Hz steps
+% - amplitudes of interest e.g. [30 80] currently increasing in 2Hz steps
+% - diag = 'yes' or 'no' to turn on or off diagrams during computation
+% - surrogates = 'yes' or 'no' to turn on or off surrogates during computation
+% - approach = 'tort','ozkurt','canolty','PLV'
+%
+% Outputs:
+% - MI_matrix_raw = phase amplitude comodulogram (no surrogates)
+% - MI_matrix_surr = = phase amplitude comodulogram (with surrogates)
+```
+
+Currently the function only accepts data from a **single** channel which could be obtained using an atlas-based approach (e.g. AAL atlas or HCP-MMP 1.0).
+
+The PAC algorithms from Tort et al., (2010), Ozkurt & Schnitzler (2011), Canolty et al., (2006) and Cohen (2008) are implemented, and more will be added soon.
 
 Example use:
 
 ```matlab
 
-% To produce a PAC comodulogram on a V1 virtual electrode using the 
+% To produce a PAC comodulogram on a single channel using the 
 % Tort et al., (2010) approach, 0.3-1.5s post-stimulus onset between
 % 7-13Hz phase and 34-100Hz amplitude, normalised by surrogate data:
 
-[MI_matrix] = calc_MI_tort(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes')
+[MI_matrix] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes','tort')
 
 ```
 
@@ -66,4 +85,4 @@ However, please be aware of the various methodological pitfalls in PAC analysis 
 
 ---
 
-For more information/queries please raise an ISSUE within Github or email me: robbyseymour [at] gmail.com
+For more information/queries please raise an ISSUE within Github or email me: robbyseymour [at] gmail.com . I am also very keen for collaborations to help improve and expand this code.
