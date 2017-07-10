@@ -41,8 +41,12 @@ for i =1:length(subject)
     MI_post.dimord = 'chan_freq_time';
     MI_post.freq = amp_list;
     MI_post.time = phase_list;
+    % if loading surrogates then the name of the variable is
+    % matrix_XXX_surrogates
     if surr == 1
         MI_post.powspctrm = matrix_post_surrogates;
+    % if loading raw MI estimate then the name of the variable is
+    % matrix_XXX   
     else
         MI_post.powspctrm = matrix_post;
     end
@@ -65,8 +69,12 @@ for i =1:length(subject)
     MI_pre.dimord = 'chan_freq_time';
     MI_pre.freq = amp_list;
     MI_pre.time = phase_list;
+    % if loading surrogates then the name of the variable is
+    % matrix_XXX_surrogates
     if surr == 1
         MI_pre.powspctrm = matrix_pre_surrogates;
+    % if loading raw MI estimate then the name of the variable is
+    % matrix_XXX 
     else
         MI_pre.powspctrm = matrix_pre;
     end
@@ -85,7 +93,7 @@ cfg.method      = 'montecarlo';
 cfg.statistic   = 'ft_statfun_depsamplesT';
 cfg.parameter   = 'powspctrm';
 cfg.correctm    = 'cluster';
-cfg.computecritval = 'yes'
+cfg.computecritval = 'yes';
 cfg.numrandomization = 1000;
 cfg.alpha       = 0.05; % Set alpha level
 cfg.tail        = 0;    % Two sided testing
@@ -115,7 +123,7 @@ cfg.ylim = amp;
 cfg.xlim    = phase;
 ft_singleplotTFR(cfg,diff_MI); colormap(jet);
 
-%% Display results of stats (more work needed)
+%% Display results of stats (very rough - use make_smoothed_comodulograms)
 cfg=[];
 cfg.parameter = 'stat';
 cfg.maskparameter = 'mask';

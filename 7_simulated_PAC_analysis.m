@@ -2,7 +2,7 @@
 %
 % 7_simulated_PAC_analysis.m
 %
-% This script produces synthesised PAC between 10-11Hz and 50-70Hz. 3 PAC
+% This script produces synthesised PAC between 10-11Hz and 50-70Hz. 4 PAC
 % algorithms are then applied to determine how well they recover this
 % coupling.
 %
@@ -23,6 +23,7 @@
 restoredefaultpath
 sensory_PAC;
 addpath(fieldtrip_dir);
+addpath(genpath(scripts_dir));
 ft_defaults
 
 % If you do not run these lines you will have to manually specify:
@@ -60,7 +61,7 @@ pcolor([7:1:13],[34:2:100],canolty_PAC); shading(gca,'interp');
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
 %title('MVL-MI-Canolty');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25); colorbar;
+set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 
@@ -70,9 +71,9 @@ ozkurt_PAC = calc_MI_ozkurt(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no');
 figure;  
 pcolor([7:1:13],[34:2:100],ozkurt_PAC); shading(gca,'interp');
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('MVL-MI');
+%title('MVL-MI');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25); colorbar;
+set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 %% Create comodulogram using the Tort method
@@ -82,9 +83,9 @@ figure;
 pcolor([7:1:13],[34:2:100],tort_PAC); shading(gca,'interp');
 colormap(jet);
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('KL-MI');
+%title('KL-MI');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25); colorbar;
+set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 
@@ -95,9 +96,9 @@ figure;
 pcolor([7:1:13],[34:2:100],PLV_PAC); shading(gca,'interp');
 colormap(jet);
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('PLV-MI');
+%title('PLV-MI');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25); colorbar;
+set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 %% How does PAC vary with trial length?
@@ -130,32 +131,32 @@ xticks = ([0:1:10]);
 
 % Plot results (Canolty)
 figure;plot([0.1:0.1:10],MI_canolty,'Color',[0.5 0 0.6],'LineWidth',6);
-title('MVL-MI');
+%title('MVL-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25);
+set(gca,'FontSize',30);
 set(gca,'XTick',xticks);
 
 % Plot results (Ozkurt)
 figure;plot([0.1:0.1:10],MI_ozkurt,'LineWidth',6);
-title('MVL-MI');
+%title('MVL-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25);
+set(gca,'FontSize',30);
 set(gca,'XTick',xticks);
 
 % Plot Results (Tort)
 figure; plot([0.1:0.1:10],MI_tort,'r','LineWidth',6); hold on;
-title('KL-MI');
+%title('KL-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25);
+set(gca,'FontSize',30);
 set(gca,'XTick',xticks);
 
 % Plot Results (PLV)
 figure; plot([0.1:0.1:10],MI_PLV,'Color',[0 0.7 0.2],'LineWidth',6); hold on;
-title('PLV-MI');
+%title('PLV-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',25);
+set(gca,'FontSize',30);
 set(gca,'XTick',xticks);

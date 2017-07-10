@@ -22,6 +22,7 @@
 restoredefaultpath;
 sensory_PAC;
 addpath(fieldtrip_dir);
+addpath(genpath(scripts_dir));
 ft_defaults
 
 % If you do not run these lines you will have to manually specify:

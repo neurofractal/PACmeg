@@ -3,8 +3,10 @@
 %
 % 6_check_non_sinusoidal.m
 %
-% Script to check for non-sinusoidal oscillations in the phase of lower
-% frequency oscillations
+% Script to check for differences in the properties of non-sinusoidal 
+% oscillations between baseline and visual grating periods.
+%
+% Written by Robert Seymour, June 2017.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -12,6 +14,7 @@
 restoredefaultpath
 sensory_PAC;
 addpath(fieldtrip_dir);
+addpath(genpath(scripts_dir));
 ft_defaults
 
 % If you do not run these lines you will have to manually specify:
@@ -42,7 +45,7 @@ end
 
 stats_all = []; % Variable to hold the output from the t-test
 p_all = []; % Variable to hold the p-value from the t-test
-count = 1; % For use wthin the loop
+count = 1; % For use within the loop
 figure; % Create figure
 
 % Start loop for phases 7-13Hz
@@ -55,7 +58,7 @@ for phase = 7:13
     [ratios_pre_grating,time_to_decay_all,time_to_peak_all] = ...
         check_non_sinusoidal_rise_decay(VE_V1,[-1.5 -0.3],phase);
     
-    % Create two overalpping histograms and add to subplot
+    % Create two overalapping histograms and add to subplot
     subplot(2,4,count); histogram(ratios_post_grating); hold on; 
     histogram(ratios_pre_grating);
     xlabel('Time to Peak:Decay'); ylabel('Count'); 

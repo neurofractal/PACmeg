@@ -21,6 +21,7 @@
 restoredefaultpath
 sensory_PAC;
 addpath(fieldtrip_dir);
+addpath(genpath(scripts_dir));
 ft_defaults
 
 % If you do not run these lines you will have to manually specify:
@@ -185,7 +186,7 @@ cfg =[];
 sourcepost_avg = ft_sourcegrandaverage(cfg,sourcepost_all{:});
 sourcepre_avg = ft_sourcegrandaverage(cfg,sourcepre_all{:});
 
-%% Take Post-Grating Power from Baseline Power
+%% Compute Percentage Power Change From Baseline
 cfg = [];
 cfg.parameter = 'pow';
 cfg.operation = '((x1-x2)/x2)*100'; % calculate & change
@@ -201,7 +202,7 @@ cfg              = [];
 cfg.voxelcoord   = 'no';
 cfg.parameter    = 'pow';
 cfg.interpmethod = 'nearest';
-diffint  = ft_sourceinterpolate(cfg, diff, mri); %your FT variable corresponding to the subject specific nifti
+diffint  = ft_sourceinterpolate(cfg, diff, mri); 
 
 %% Export to nifti formt and use your favourite MRI software to visualise
 cd(scripts_dir);
@@ -421,7 +422,7 @@ cfg              = [];
 cfg.voxelcoord   = 'no';
 cfg.parameter    = 'pow';
 cfg.interpmethod = 'nearest';
-diffint  = ft_sourceinterpolate(cfg, diff, mri); %your FT variable corresponding to the subject specific nifti
+diffint  = ft_sourceinterpolate(cfg, diff, mri); 
 
 %% Export to nifti formt and use your favourite MRI software to visualise
 cd(scripts_dir);

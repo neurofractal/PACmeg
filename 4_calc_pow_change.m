@@ -3,7 +3,7 @@
 % 
 % 4_calc_pow_change.m
 %
-% This is a script to compute the % change in power from 1-100Hz
+% This script will compute the % change in power from 1-100Hz
 % usng data from the the V1 virtual electrode. A multi-taper approach is
 % employed.
 %
@@ -17,6 +17,7 @@
 restoredefaultpath
 sensory_PAC;
 addpath(fieldtrip_dir);
+addpath(genpath(scripts_dir));
 ft_defaults
 
 % If you do not run these lines you will have to manually specify:
@@ -25,15 +26,12 @@ ft_defaults
 % - scripts_dir = directory with ALL the scripts
 % - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
-%% Create figure to be used
-figure; hold on; 
 perc_change_all = []; % variabe to hold output from all subjects
 
 %% Start loop for each subject
 for i = 1:length(subject)
     
-    % cd to the right place and load the V1 virtual electrode
-    
+    % cd to the right place and load the V1 virtual electrode    
     load([scripts_dir '\' subject{i} '\VE_V1.mat']);
     
     % Calculate Power in Grating & Baseline Periods
@@ -45,7 +43,7 @@ for i = 1:length(subject)
     cfg.t_ftimwin    = ones(length(cfg.foi),1).*0.5;
     cfg.tapsmofrq  = ones(length(cfg.foi),1).*8;
     multitaper_post = ft_freqanalysis(cfg, VE_V1);
-    cfg.toi = -1.5:0.02:-0.3; %change time-window
+    cfg.toi = -1.5:0.02:-0.3; %1200ms baseline period
     multitaper_pre = ft_freqanalysis(cfg, VE_V1);
     
     % Calculate % change by averaging over time
@@ -59,10 +57,9 @@ for i = 1:length(subject)
 
 end
 
-%% Add overall mean % change to graph in black and add information to the graph
+%% Create Figure
 
 % This corresponds to Figure 3D
-
 average_change = mean(perc_change_all);
 figHandle = figure;
 % Add the line to the figure
@@ -75,6 +72,6 @@ plot([1:1:100],average_change,'k','LineWidth',6);
 ylabel('% Power Change');
 xlabel('Frequency (Hz)');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',20);
+set(gca,'FontSize',30);
 set(gcf, 'Color', 'w');
 

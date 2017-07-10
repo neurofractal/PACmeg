@@ -20,7 +20,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [ratios,time_to_decay_all,time_to_peak_all] = check_non_sinusoidal_rise_decay(virtsens,toi,phase);
+function [ratios,time_to_decay_all,time_to_peak_all] = check_non_sinusoidal_rise_decay(virtsens,toi,phase)
 
 % 
 % % Filter data at phase frequency using Butterworth filter
@@ -42,8 +42,7 @@ time_to_decay_all = []; %variable to hold time_to_decay for all trials
 time_to_peak_all = [];
 p = 1;
 
-%% For every trial number
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% For every trial number calculate Calculate time to peak and time to decay
 
 for trial_num = 1:length(virtsens.trial)
     % Get the time series (for peaks) and flipped time series (for troughs)

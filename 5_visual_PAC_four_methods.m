@@ -26,6 +26,7 @@
 restoredefaultpath
 sensory_PAC;
 addpath(fieldtrip_dir);
+addpath(genpath(scripts_dir));
 ft_defaults
 
 % If you do not run these lines you will have to manually specify:
@@ -38,7 +39,7 @@ ft_defaults
 for sub = 1:length(subject)
     %%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Tort et al., (2008)
+    % Tort et al., (2010)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
      % Load in data and cd to the right place
@@ -49,14 +50,16 @@ for sub = 1:length(subject)
     addpath(scripts_dir)
 
      % Get comod for post grating (0.3 to 1.5s) period
-    [matrix_post] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no');
+    [matrix_post,matrix_post_surrogates] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes','tort');
     save matrix_post_tort matrix_post;  
+    save matrix_post_tort_surrogates matrix_post_surrogates; 
 
     % Get comod for pre grating (-1.5 to -0.3s) period
-    [matrix_pre] = calc_MI(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no')
+    [matrix_pre,matrix_pre_surrogates] = calc_MI(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no','yes','tort')
     save matrix_pre_tort matrix_pre;
+    save matrix_pre_tort_surrogates matrix_pre_surrogates; 
     
-    clear matrix_post matrix_pre
+    clear matrix_post matrix_pre matrix_post_surrogates matrix_pre_surrogates
 
     %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,58 +67,71 @@ for sub = 1:length(subject)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Get comod for post grating (0.3 to 1.5s) period
-    [matrix_post] = calc_MI_ozkurt(VE_V1,[0.3 1.5],[7 13],[34 100],'no');
-    save matrix_post_ozkurt matrix_post; 
+    [matrix_post,matrix_post_surrogates] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes','ozkurt');
+    save matrix_post_ozkurt matrix_post;
+    save matrix_post_ozkurt_surrogates matrix_post_surrogates; 
 
     % Get comod for pre grating (-1.5 to -0.3s) period
-    [matrix_pre] = calc_MI_ozkurt(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no')
-    save matrix_pre_ozkurt matrix_pre;  
+    [matrix_pre,matrix_pre_surrogates] = calc_MI(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no','yes','ozkurt')
+    save matrix_pre_ozkurt matrix_pre;
+    save matrix_pre_ozkurt_surrogates matrix_pre_surrogates;   
 
-    clear matrix_post matrix_pre
-    %
+    clear matrix_post matrix_pre matrix_post_surrogates matrix_pre_surrogates
+    
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Canolty et al., (2006)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Get comod for post grating (0.3 to 1.5s) period
-    [matrix_post] = calc_MI_canolty(VE_V1,[0.3 1.5],[7 13],[34 100],'no');
-    save matrix_post_canolty matrix_post; clear MI_matrix  
+    [matrix_post,matrix_post_surrogates] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes','canolty');
+    save matrix_post_canolty matrix_post;
+    save matrix_post_canolty_surrogates matrix_post_surrogates; 
 
     % Get comod for pre grating (-1.5 to -0.3s) period
-    [matrix_pre] = calc_MI_canolty(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no')
-    save matrix_pre_canolty matrix_pre; 
+    [matrix_pre,matrix_pre_surrogates] = calc_MI(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no','yes','canolty')
+    save matrix_pre_canolty matrix_pre;
+    save matrix_pre_canolty_surrogates matrix_pre_surrogates;   
 
-    clear matrix_post matrix_pre
+    clear matrix_post matrix_pre matrix_post_surrogates matrix_pre_surrogates
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % PLV
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % Get comod for post grating (0.3 to 1.5s) period
-    [matrix_post] = calc_MI_PLV(VE_V1,[0.3 1.5],[7 13],[34 100],'no');
-    save matrix_post_PLV matrix_post; clear MI_matrix  
+    [matrix_post,matrix_post_surrogates] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes','PLV');
+    save matrix_post_PLV matrix_post;
+    save matrix_post_PLV_surrogates matrix_post_surrogates; 
 
     % Get comod for pre grating (-1.5 to -0.3s) period
-    [matrix_pre] = calc_MI_PLV(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no')
+    [matrix_pre,matrix_pre_surrogates] = calc_MI(VE_V1,[-1.5 -0.3],[7 13],[34 100],'no','yes','PLV')
     save matrix_pre_PLV matrix_pre;
-    
-    clear matrix_post matrix_pre
+    save matrix_pre_PLV_surrogates matrix_pre_surrogates;   
+
+    clear matrix_post matrix_pre matrix_post_surrogates matrix_pre_surrogates
     
 end
 
 
-cd(scripts_dir)
-
-%% Statistical Analysis
-
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Statistical Analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Canolty et al., (2006) - MVL
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [stat_canolty] = get_PAC_stats('matrix_post_canolty.mat',...
-    'matrix_pre_canolty',[7 13],[34 100],subject,scripts_dir) 
+    'matrix_pre_canolty',[7 13],[34 100],subject,scripts_dir,0) 
 
-make_smoothed_comodulograms(stat_canolty, [7 13], [34 100]);
+[stat_canolty_surr] = get_PAC_stats('matrix_post_canolty_surrogates.mat',...
+    'matrix_pre_canolty_surrogates',[7 13],[34 100],subject,scripts_dir,1) 
+
+make_smoothed_comodulograms(stat_canolty, [7 13], [34 100]); 
+title('Canolty 2006 - no surr');
+make_smoothed_comodulograms(stat_canolty_surr, [7 13], [34 100]);
+title('Canolty 2006 - with surr');
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -123,18 +139,31 @@ make_smoothed_comodulograms(stat_canolty, [7 13], [34 100]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [stat_ozkurt] = get_PAC_stats('matrix_post_ozkurt.mat',...
-    'matrix_pre_ozkurt',[7 13],[34 100],subject,scripts_dir) 
+    'matrix_pre_ozkurt',[7 13],[34 100],subject,scripts_dir,0) 
+
+[stat_ozkurt_surr] = get_PAC_stats('matrix_post_ozkurt_surrogates.mat',...
+    'matrix_pre_ozkurt_surrogates',[7 13],[34 100],subject,scripts_dir,1) 
+
 
 make_smoothed_comodulograms(stat_ozkurt, [7 13], [34 100]);
+title('Okzurt 2011 - no surr');
+make_smoothed_comodulograms(stat_ozkurt_surr, [7 13], [34 100]);
+title('Okzurt 2011 - with surr');
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Cohen et al., (2008) - PLV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [stat_PLV] = get_PAC_stats('matrix_post_PLV.mat',...
-    'matrix_pre_PLV',[7 13],[34 100],subject,scripts_dir) 
+    'matrix_pre_PLV',[7 13],[34 100],subject,scripts_dir,0) 
+
+[stat_PLV_surr] = get_PAC_stats('matrix_post_PLV_surrogates.mat',...
+    'matrix_pre_PLV_surrogates',[7 13],[34 100],subject,scripts_dir,1) 
 
 make_smoothed_comodulograms(stat_PLV, [7 13], [34 100]);
+title('Cohen PLV - no surr');
+make_smoothed_comodulograms(stat_PLV_surr, [7 13], [34 100]);
+title('Cohen PLV - with surr');
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -142,6 +171,13 @@ make_smoothed_comodulograms(stat_PLV, [7 13], [34 100]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [stat_tort] = get_PAC_stats('matrix_post_tort.mat',...
-    'matrix_pre_tort.mat',[7 13],[34 100],subject,scripts_dir) 
+    'matrix_pre_tort.mat',[7 13],[34 100],subject,scripts_dir,0) 
+
+[stat_tort_surr] = get_PAC_stats('matrix_post_tort_surrogates.mat',...
+    'matrix_pre_tort_surrogates.mat',[7 13],[34 100],subject,scripts_dir,1) 
 
 make_smoothed_comodulograms(stat_tort, [7 13], [34 100]);
+title('Tort 2010 - no surr');
+make_smoothed_comodulograms(stat_tort_surr, [7 13], [34 100]);
+title('Tort 2010 - with surr');
+

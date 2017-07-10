@@ -1,13 +1,15 @@
-function [s_final, snr] = synthesize_pac(noise_lev)
-
-% adapted from Kramer et al. (2008), Jrn. Nrsc. Methds. 
-% and Ozkurt et al., (2011) Jrn. Nrsc. Methds.
-
-% this functions simulates a signal containing phase-amplitude cooupling (PAC)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% synthesize_pac.m
+%
+% Function to simulate a signal containing phase-amplitude coupling
 % between the phase of a low frequency (10-11Hz Hz) and amplitude of a
 % high-freqency band (50-70 Hz) for a chosen noise level. Hamming tapered
 % high frequency signal is added at each cycle of low frequency component.
 % sampling frequency is chosen as 1000 Hz.
+
+% Code is adapted from Kramer et al. (2008), Jrn. Nrsc. Methds. 
+% and Ozkurt et al., (2011) Jrn. Nrsc. Methds.
 
 % Inputs: 
 % - noise lev : parameter describing the noise power
@@ -15,6 +17,9 @@ function [s_final, snr] = synthesize_pac(noise_lev)
 % Outputs:
 % - snr : signal-to-noise ratio
 % - s_final: the synthesized signal
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [s_final, snr] = synthesize_pac(noise_lev)
 
 dt = 0.001;
 s = [];
@@ -41,7 +46,6 @@ snr = 10 * log10((s*s') / (n*n'));
 
 % Add in noise
 s = s + n;
-sorig = s;
 s = s(1:12000);
 sCropped = s(1000:11000-1);
 

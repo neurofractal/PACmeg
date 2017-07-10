@@ -43,7 +43,7 @@ ft_defaults
 for i=1:length(subject)
    
     %% Load variables required for source analysis
-    load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']); % non-ICA'd data
+    load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']);
     load([data_dir '\' subject{i} '\anat\sens.mat']);
     load([data_dir '\' subject{i} '\anat\seg.mat']);
     sens = ft_convert_units(sens,'m');
@@ -98,7 +98,7 @@ for i=1:length(subject)
     %% Time-Lock Analysis
     cfg = [];
     cfg.channel = chans_included;
-    cfg.covariance = 'yes'; % compute the covariance for single trials, then averFEFe
+    cfg.covariance = 'yes'; % compute the covariance for single trials, then average
     cfg.preproc.baselinewindow = [-inf 0];  % reapply the baseline correction
     cfg.keeptrials = 'no';
     timelock1 = ft_timelockanalysis(cfg, data_clean_noICA);
@@ -171,7 +171,7 @@ for i=1:length(subject)
     VE_V1.label = {'VE_V1'};
     VE_V1.trialinfo = data_clean_noICA.trialinfo;
     for sub=1:(length(data_clean_noICA.trialinfo))
-        % note that this is the non-filtered raw data
+        % note that this is the non-filtered "raw" data
         VE_V1.time{sub}       = data_clean_noICA.time{sub};
         VE_V1.trial{sub}(1,:) = filter(1,:)*data_clean_noICA.trial{sub}(:,:);
     end
@@ -180,6 +180,7 @@ for i=1:length(subject)
     save VE_V1 VE_V1
     
     %% Create TFR of the VE
+    % Note - these results are not shown in the manuscript 
     cfg = [];
     cfg.method = 'mtmconvol';
     cfg.output = 'pow';
