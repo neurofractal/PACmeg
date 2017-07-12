@@ -3,9 +3,13 @@
 % 
 % 4_calc_pow_change.m
 %
-% This script will compute the % change in power from 1-100Hz
-% usng data from the the V1 virtual electrode. A multi-taper approach is
-% employed.
+% This script computes the percentage change in oscillatory power 
+% between baseline and grating periods, from 1-100Hz using data from the 
+% V1 virtual electrode. A multi-taper approach is employed with a 0.5s 
+% window and +-8Hz frequency smoothing.
+%
+% A figure is then produced to show each subject's percentage power change
+% as well as the average power change response.
 %
 % Written by: Robert Seymour, June 2017
 %

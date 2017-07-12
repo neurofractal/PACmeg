@@ -3,11 +3,13 @@
 % 
 % 1_preprocessing_elekta_frontiers_PAC.m
 %
-% This is a Matlab script to perform SIMPLE preprocessing on the visual
-% grating data, obtained from the Aston Brain Centre, Birmingham, UK.
+% Matlab script to perform SIMPLE preprocessing using the Fieldtrip
+% toolbox (common preprocessing, visualisation and artefact rejection
+% steps).
 %
-% The script runs through the common preprocessing, visualisation
-% and artefact rejection steps.
+% Here we use visual grating data, obtained from the Aston Brain Centre,
+% Birmingham (UK), using a Neuromag Elekta (Triux 306 channel) MEG scanner.
+% N.B. The trigger code for the onset of the visual grating is 'STI005'. 
 %
 % Output = data_clean_noICA
 %
@@ -34,7 +36,6 @@ ft_defaults
 for i = 1:length(subject)
     %% Prerequisites
     % Make a new directory in the scripts folder & cd there
-    
     mkdir([scripts_dir '\' subject{i}]);
     cd([scripts_dir '\' subject{i}]);
     
@@ -65,13 +66,13 @@ for i = 1:length(subject)
     cfg.dftfreq = [50];
     alldata = ft_preprocessing(cfg);
     
-    % Deal with 50Hz line noise
+    % Deal with 50Hz line noise using a bandstop filter
     cfg = [];
     cfg.bsfilter = 'yes';
     cfg.bsfreq = [49.5 50.5];
     alldata = ft_preprocessing(cfg,alldata);
     
-    % Deal with 100Hz line noise
+    % Deal with 100Hz line noise using a bandstop filter
     cfg = [];
     cfg.bsfilter = 'yes';
     cfg.bsfreq = [99.5 100.5];
@@ -98,7 +99,8 @@ for i = 1:length(subject)
     
     %% Reject Trials
     % Display visual trial summary to reject deviant trials.
-    % You need to load the mag + grad separately due to different scales
+    % You need to load the mag + grad separately due to different scales.
+    % Please refer to the .tsv file for indices of rejected trials.
     
     cfg = [];
     cfg.method = 'summary';

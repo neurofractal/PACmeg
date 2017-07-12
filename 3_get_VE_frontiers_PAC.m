@@ -151,6 +151,7 @@ for i=1:length(subject)
 
     %% Compute the V1 virtual electrode
     
+    % Get spatial filters from 192 V1 vertices (left and right hemisphere) 
     indx_V1_L = find(ismember(atlas.parcellationlabel,'L_V1_ROI')); % find index of the required label
     sel = find(atlas.parcellation==indx_V1_L);
     vertices_V1_L    = cat(1,source.avg.filter{sel});

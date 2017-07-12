@@ -3,8 +3,10 @@
 %
 % 6_check_non_sinusoidal.m
 %
-% Script to check for differences in the properties of non-sinusoidal 
-% oscillations between baseline and visual grating periods.
+% Script to quantify the non-sinusoidal properties of oscillations within
+% vidual area V1. Data is concatenated and the rise-time versus decay time 
+% of low frequency alpha oscillations is calculated. This ratio is 
+% compared between baseline and grating periods.
 %
 % Written by Robert Seymour, June 2017.
 %

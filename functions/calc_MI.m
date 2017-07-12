@@ -1,7 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Function to calculate a comodulogram of Modulation Index (MI) values
-% from Fieldtrip data using the metrics from Tort et al.,(2010),
-% Ozkurt(2011), Canolty et al., (2006) and PLV (Cohen et al., 2008).
+% Function to produce a comodulogram of Phase Amplitude Coupling (PAC)
+% Modulation Index (MI) values using the metrics from Tort et al.,(2010),
+% Ozkurt & Schnitzler (2011), Canolty et al., (2006) and 
+% PLV (Cohen 2008).
 %
 % Inputs:
 % - virtsens = MEG data (1 channel)
@@ -43,18 +44,18 @@ clear phase_length amp_length
 row1 = 1;
 row2 = 1;
 
-for k = phase(1):1:phase(2)
-    for p = amp(1):2:amp(2)
+for phase_freq = phase(1):1:phase(2)
+    for amp_freq = amp(1):2:amp(2)
         %% Bandpass filter individual trials using a two-way Butterworth Filter
         
-        % Specifiy bandwith = +- 1/2.5 of center frequency
-        Af1 = round(p -(p/2.5)); Af2 = round(p +(p/2.5));
+        % Specifiy bandwith = +- 2.5 * center frequency
+        Af1 = round(amp_freq -(amp_freq/2.5)); Af2 = round(amp_freq +(amp_freq/2.5));
         
         % Filter data at phase frequency using Butterworth filter
         cfg = [];
         cfg.showcallinfo = 'no';
         cfg.bpfilter = 'yes';
-        cfg.bpfreq = [k-1 k+1]; %+-1Hz - could be changed if necessary
+        cfg.bpfreq = [phase_freq-1 phase_freq+1]; %+-1Hz - could be changed if necessary
         cfg.hilbert = 'angle';
         [virtsens_phase] = ft_preprocessing(cfg, virtsens);
         
@@ -66,23 +67,23 @@ for k = phase(1):1:phase(2)
         cfg.hilbert = 'abs';
         [virtsens_amp] = ft_preprocessing(cfg, virtsens);
         
-        % Cut out window of interest (phase) - should exlude phase-locked
+        % Cut out window of interest - should exlude phase-locked
         % responses (e.g. ERPs)
         cfg = [];
         cfg.toilim = toi; %specfied in function calls
         cfg.showcallinfo = 'no';
-        post_grating_phase = ft_redefinetrial(cfg,virtsens_phase);
-        post_grating_amp = ft_redefinetrial(cfg,virtsens_amp);
+        virtsens_phase_toi = ft_redefinetrial(cfg,virtsens_phase);
+        virtsens_amp_toi = ft_redefinetrial(cfg,virtsens_amp);
         
         % Variable to hold MI for all trials
-        MI_comb = [];
+        MI_all_trials = [];
         
         % For each trial...
         for trial_num = 1:length(virtsens.trial)
             
             % Extract phase and amp info using hilbert transform
-            Phase= post_grating_phase.trial{1, trial_num}; % getting the phase
-            Amp= post_grating_amp.trial{1, trial_num}; % getting the amplitude envelope
+            Phase=virtsens_phase_toi.trial{1, trial_num}; % getting the phase
+            Amp= virtsens_amp_toi.trial{1, trial_num}; % getting the amplitude envelope
             
             % Switch PAC method based on the approach
             switch approach
@@ -100,11 +101,11 @@ for k = phase(1):1:phase(2)
             end
             
             % Add the MI value to all other all other values
-            MI_comb(trial_num) = MI;
+            MI_all_trials(trial_num) = MI;
             
         end
         
-        % If user specified to use surrogtes - use them!
+        % If user specified to use surrogates - use them!
         if strcmp(surrogates, 'yes')
             
             % Variable to surrogate MI
@@ -113,12 +114,12 @@ for k = phase(1):1:phase(2)
             % For each surrogate (surrently hard-coded for 200, could be changed)...
             for surr = 1:200
                 % Get 2 random trial numbers
-                trial_num = randperm(length(post_grating_phase.trialinfo),2);
+                trial_num = randperm(length(virtsens_phase_toi.trialinfo),2);
                 
                 % Extract phase and amp info using hilbert transform
                 % for different trials & shuffle phase
-                Phase= post_grating_phase.trial{1, trial_num(1)}(randperm(length(post_grating_phase.trial{1,trial_num(1)}))); % getting the phase
-                Amp = post_grating_amp.trial{1,trial_num(2)};
+                Phase=virtsens_phase_toi.trial{1, trial_num(1)}(randperm(length(virtsens_phase_toi.trial{1,trial_num(1)}))); % getting the phase
+                Amp = virtsens_amp_toi.trial{1,trial_num(2)};
                 
                 % Switch PAC approach based on user input
                 
@@ -142,7 +143,7 @@ for k = phase(1):1:phase(2)
             end
             
             % Calculate average MI over trials
-            MI_raw = mean(MI_comb);
+            MI_raw = mean(MI_all_trials);
             
             % Subtract the mean of the surrogaates from the actual PAC
             % value and add this to the surrogate matrix
@@ -152,7 +153,7 @@ for k = phase(1):1:phase(2)
         end
         
         % Calculate the raw MI score (no surrogates) and add to the matrix
-        MI_raw = mean(MI_comb);
+        MI_raw = mean(MI_all_trials);
         MI_matrix_raw(row1,row2) = MI_raw;
         
         % Show progress of the comodulogram if diag = 'yes'
@@ -169,7 +170,7 @@ for k = phase(1):1:phase(2)
         % Go to next Amplitude
         row1 = row1 + 1;
         
-        (fprintf('Phase: %d Amplitude: %d  MI: %d',k,p,MI_raw));
+        (fprintf('Phase: %d Amplitude: %d  MI: %d',phase_freq,amp_freq,MI_raw));
         
     end
 
@@ -205,7 +206,7 @@ end
         
         % Plot the result to see if there's any amplitude modulation
         if strcmp(diag, 'yes')
-            bar(10:20:720,[MeanAmp,MeanAmp]/sum(MeanAmp),'k')
+            bar(10:20:720,[MeanAmp,MeanAmp]/sum(MeanAmp),'phase_freq')
             xlim([0 720])
             set(gca,'xtick',0:360:720)
             xlabel('Phase (Deg)')

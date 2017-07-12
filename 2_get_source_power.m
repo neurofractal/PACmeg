@@ -3,17 +3,19 @@
 % 2_get_source_power.m
 %
 % This script computes source-space power for baseline and grating periods
-% in the gamma-band (40-60Hz) and then the alpha-band (8-13Hz).
+% in the gamma-band (40-60Hz) and then the alpha-band (8-13Hz), using an
+% LCMV beamformer.
 %
 % For source localisation, a 3D cortical mesh of 4002 vertices per 
-% hemisphere is used, which is created from Freesurfer and HCP scripts.
+% hemisphere is used, created using Freesurfer and HCP scripts. 
 %
 % A grandaverage is computed for each frequency band and exported to .nii
-% and .gii formats
+% and .gii formats. Please use your favorite MRI visualisation software to
+% view these whole-brain % power change maps.
 %
-% Written by Robert Seymour February 2017
+% Written by Robert Seymour June 2017
 %
-% Running Time: 15-20 mins
+% Running Time: 15-20 mins per frequency band
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -31,8 +33,8 @@ ft_defaults
 % - fieldtrip_dir = directory containing the Fieldtrip toolbox
 
 %% Arrays to hold source estimates for each subject
-sourcepre_all = [];
-sourcepost_all = [];
+sourcepre_all = []; %baseline
+sourcepost_all = []; %grating period
 
 %% Pre-load the Conte69 Brain Template from the HCP
 conte69brain = ft_read_headshape({[scripts_dir ...
@@ -46,6 +48,7 @@ for i=1:length(subject)
     load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']); % non-ICA'd data
     load([data_dir '\' subject{i} '\anat\sens.mat']);
     load([data_dir '\' subject{i} '\anat\seg.mat']);
+    % Convert to consistent units
     sens = ft_convert_units(sens,'m');
     seg = ft_convert_units(seg,'m');
     %% Set the current directory
@@ -98,7 +101,7 @@ for i=1:length(subject)
     
     %% Bandpass Filter 
     cfg = [];
-    cfg.channel = chans_included; %performing the analysis only on the gradiometers
+    cfg.channel = chans_included; 
     cfg.bpfilter = 'yes'
     cfg.bpfreq = [40 60];    %band-pass filter in the required range
     data_filtered = ft_preprocessing(cfg,data_clean_noICA)
@@ -181,7 +184,7 @@ for i=1:length(subject)
     sourcepost_all{i} = sourcepstS1;
 end
 
-%% Compute Source Grand Average
+%% Compute Source Grand Average in the Gamma Band
 cfg =[];
 sourcepost_avg = ft_sourcegrandaverage(cfg,sourcepost_all{:});
 sourcepre_avg = ft_sourcegrandaverage(cfg,sourcepre_all{:});
@@ -242,8 +245,7 @@ ft_sourcewrite(cfg,diffint);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(scripts_dir)
-clear all 
-close all 
+clear all ; close all 
 clc
 
 %% Load computer-specific information
@@ -252,8 +254,8 @@ addpath(fieldtrip_dir);
 ft_defaults
 
 %% Arrays to hold source estimates for each subject
-sourcepre_all = [];
-sourcepost_all = [];
+sourcepre_all = []; %baseline
+sourcepost_all = []; %grating
 
 %% Pre-load the Conte69 Brain Template from the HCP
 conte69brain = ft_read_headshape({[scripts_dir ...
@@ -267,6 +269,7 @@ for i=1:length(subject)
     load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']); % non-ICA'd data
     load([data_dir '\' subject{i} '\anat\sens.mat']);
     load([data_dir '\' subject{i} '\anat\seg.mat']);
+    % Convert to consistent units
     sens = ft_convert_units(sens,'m');
     seg = ft_convert_units(seg,'m');
     %% Set the current directory
@@ -318,7 +321,7 @@ for i=1:length(subject)
     
     %% BP Filter & Select Gradiometers
     cfg = [];
-    cfg.channel = chans_included; %performing the analysis only on the gradiometers
+    cfg.channel = chans_included; 
     cfg.bpfilter = 'yes'
     cfg.bpfreq = [8 13];    %band-pass filter in the required range
     data_filtered = ft_preprocessing(cfg,data_clean_noICA)

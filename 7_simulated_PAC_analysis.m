@@ -54,49 +54,49 @@ for i = 1:64 % for every trial
 end
 
 %% Create comodulogram using the Ozkurt method
-canolty_PAC = calc_MI_canolty(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no');
+canolty_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','canolty');
 
 figure; xticks = [7:1:13];
 pcolor([7:1:13],[34:2:100],canolty_PAC); shading(gca,'interp');
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-%title('MVL-MI-Canolty');
+title('MVL-MI-Canolty');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 
 %% Create comodulogram using the Ozkurt method
-ozkurt_PAC = calc_MI_ozkurt(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no');
+ozkurt_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','ozkurt');
 
 figure;  
 pcolor([7:1:13],[34:2:100],ozkurt_PAC); shading(gca,'interp');
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-%title('MVL-MI');
+title('MVL-MI');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 %% Create comodulogram using the Tort method
-tort_PAC = calc_MI_tort(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no');
+tort_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','tort');
 
 figure; 
 pcolor([7:1:13],[34:2:100],tort_PAC); shading(gca,'interp');
 colormap(jet);
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-%title('KL-MI');
+title('KL-MI');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 
 %% Create comodulogram using the Cohen PLV method
-PLV_PAC = calc_MI_PLV(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no');
+PLV_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','PLV');
 
 figure; 
 pcolor([7:1:13],[34:2:100],PLV_PAC); shading(gca,'interp');
 colormap(jet);
 colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-%title('PLV-MI');
+title('PLV-MI');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
@@ -106,32 +106,32 @@ set(gca,'XTick',xticks);
 MI_canolty = []; % 0.1-10s in 0.1s steps
 
 for k = 1:100
-    MI_canolty(k) = calc_MI_canolty(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no');
+    MI_canolty(k) = calc_MI(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no','canolty');
 end
 
 MI_ozkurt = [];
 
 for k = 1:100 % 0.1-10s in 0.1s steps
-    MI_ozkurt(k) = calc_MI_ozkurt(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no');
+    MI_ozkurt(k) = calc_MI(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no','ozkurt');
 end
 
 MI_tort = []; % 0.1-10s in 0.1s steps
 
 for k = 1:100
-    MI_tort(k) = calc_MI_tort(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no');
+    MI_tort(k) = calc_MI(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no','tort');
 end
 
 MI_PLV = []; % 0.1-10s in 0.1s steps
 
 for k = 1:100
-    MI_PLV(k) = calc_MI_PLV(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no');
+    MI_PLV(k) = calc_MI(VE_PAC,[0 (k/10)],[10 10],[60 60],'no','no','PLV');
 end
 
 xticks = ([0:1:10]);
 
 % Plot results (Canolty)
 figure;plot([0.1:0.1:10],MI_canolty,'Color',[0.5 0 0.6],'LineWidth',6);
-%title('MVL-MI');
+title('MVL-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30);
@@ -139,7 +139,7 @@ set(gca,'XTick',xticks);
 
 % Plot results (Ozkurt)
 figure;plot([0.1:0.1:10],MI_ozkurt,'LineWidth',6);
-%title('MVL-MI');
+title('MVL-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30);
@@ -147,7 +147,7 @@ set(gca,'XTick',xticks);
 
 % Plot Results (Tort)
 figure; plot([0.1:0.1:10],MI_tort,'r','LineWidth',6); hold on;
-%title('KL-MI');
+title('KL-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30);
@@ -155,7 +155,7 @@ set(gca,'XTick',xticks);
 
 % Plot Results (PLV)
 figure; plot([0.1:0.1:10],MI_PLV,'Color',[0 0.7 0.2],'LineWidth',6); hold on;
-%title('PLV-MI');
+title('PLV-MI');
 xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30);
