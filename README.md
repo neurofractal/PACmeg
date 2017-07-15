@@ -6,9 +6,11 @@ Written and maintained by **[Robert Seymour](http://robertseymour.me)**, June 20
 
 ![sensory_PAC](https://github.com/neurofractal/sensory_PAC/blob/master/figures_and_results/PAC_figure4-1.jpg)
 
-## Manuscript
+## Manuscript & Citation
 
-**Seymour, Kessler & Rippon (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. In prep.**
+**Seymour, R. A., Rippon, G., & Kessler, K. (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. bioRxiv. https://doi.org/10.1101/163006**
+
+The pre-print of the manuscript is available to download on [Biorxiv](https://doi.org/10.1101/163006). 
 
 ## Data Sharing
 
