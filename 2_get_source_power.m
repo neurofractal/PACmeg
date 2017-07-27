@@ -358,7 +358,6 @@ for i=1:length(subject)
     % Create headmodel
     cfg        = [];
     cfg.method = 'singleshell';
-    cfg.method ='projectmesh';
     headmodel  = ft_prepare_headmodel(cfg, seg);
     
         % Load headshape
