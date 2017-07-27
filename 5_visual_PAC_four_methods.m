@@ -18,6 +18,9 @@
 %
 % Written by Robert Seymour - June 2017
 %
+% Please note that these scripts have been optimised for the Windows
+% operating system and MATLAB versions about 2014b.
+%
 % Computation time: 4-6 hours
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,9 +44,8 @@ for sub = 1:length(subject)
     % Load in data and cd to the right place
     cd([scripts_dir '\' subject{sub}])
     load([scripts_dir '\' subject{sub} '\VE_V1.mat']);
-    
-    % Add path to PAC functions
-    addpath(scripts_dir)
+    load([scripts_dir '\' subject{sub} '\data_clean_noICA.mat']);
+    VE_V1.sampleinfo = data_clean_noICA.sampleinfo;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Tort et al., (2010)

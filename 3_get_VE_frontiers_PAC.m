@@ -18,6 +18,9 @@
 %
 % Written by Robert Seymour - June 2017
 %
+% Please note that these scripts have been optimised for the Windows
+% operating system and MATLAB versions about 2014b.
+%
 % Running-time: 15-20 minutes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -99,6 +102,7 @@ for i=1:length(subject)
     cfg = [];
     cfg.channel = chans_included;
     cfg.covariance = 'yes'; % compute the covariance for single trials, then average
+    cfg.covariancewindow = [-1.5 1.5]; % compute the covariance for single trials, then average
     cfg.preproc.baselinewindow = [-inf 0];  % reapply the baseline correction
     cfg.keeptrials = 'no';
     timelock1 = ft_timelockanalysis(cfg, data_clean_noICA);
@@ -115,7 +119,7 @@ for i=1:length(subject)
     
     %% Create leadfields
     cfg=[];
-    cfg.vol=headmodel;
+    cfg.headmodel=headmodel;
     cfg.channel= chans_included;
     cfg.grid.pos= sourcespace.pos;
     cfg.grid.unit      ='m';
@@ -146,12 +150,12 @@ for i=1:length(subject)
     cfg.lcmv.fixedori = 'yes';
     cfg.lcmv.keepfilter = 'yes';
     cfg.lcmv.projectmom = 'no';
-    cfg.normalize = 'yes';
+    cfg.lcmv.normalize = 'yes';
     source=ft_sourceanalysis(cfg, timelock1);
 
     %% Compute the V1 virtual electrode
     
-    % Get spatial filters from 192 V1 vertices (left and right hemisphere) 
+    % Get spatial filters from 182 V1 vertices (left and right hemisphere) 
     indx_V1_L = find(ismember(atlas.parcellationlabel,'L_V1_ROI')); % find index of the required label
     sel = find(atlas.parcellation==indx_V1_L);
     vertices_V1_L    = cat(1,source.avg.filter{sel});
@@ -177,6 +181,9 @@ for i=1:length(subject)
         VE_V1.trial{sub}(1,:) = filter(1,:)*data_clean_noICA.trial{sub}(:,:);
     end
     
+    % Preserve .sampleinfo field to avoid warnings later
+    VE_V1.sampleinfo = data_clean_noICA.sampleinfo;
+    
     % Save
     save VE_V1 VE_V1
     
@@ -185,6 +192,7 @@ for i=1:length(subject)
     cfg = [];
     cfg.method = 'mtmconvol';
     cfg.output = 'pow';
+    cfg.pad = 'nextpow2'
     cfg.foi = 20:1:100;
     cfg.toi = -2.0:0.02:2.0;
     cfg.t_ftimwin    = ones(length(cfg.foi),1).*0.5;

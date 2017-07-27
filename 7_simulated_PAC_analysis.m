@@ -15,6 +15,9 @@
 %
 % Written by: Robert Seymour, June 2017
 %
+% Please note that these scripts have been optimised for the Windows
+% operating systm and MATLAB versions about 2014b.
+%
 % Runtime: 10 minutes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,9 +40,8 @@ figure; plot(s_final(1:1000));
 
 %% Create 64 different SNRs
 
-for i = 1:64
-    snr_array(i) = (3*rand(1,1)); % Noise value varies from 0-3
-end
+rng('default'); rng(1)
+snr_array = rand(64,1)*3
 
 %% Create Fieldtrip-like Virtual Electrode with 64 trials of synthesised PAC
 VE_PAC = [];
@@ -51,54 +53,58 @@ for i = 1:64 % for every trial
     VE_PAC.time{1,i} = 0.001:0.001:10; % Create 10s worth of PAC
     VE_PAC.trialinfo(i,1) = 1;
     disp(['Trial ' num2str(i)]);
+    VE_PAC.sampleinfo(i,:) = [10000*i 10000*i+9999];
 end
+
 
 %% Create comodulogram using the Ozkurt method
 canolty_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','canolty');
 
 figure; xticks = [7:1:13];
-pcolor([7:1:13],[34:2:100],canolty_PAC); shading(gca,'interp');
-colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('MVL-MI-Canolty');
+pcolor([7:1:13],[34:2:100],canolty_PAC); shading(gca,'interp'); 
+colormap(jet);
+set(gca,'FontSize',30);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+%title('MVL-MI-Canolty');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 
 %% Create comodulogram using the Ozkurt method
 ozkurt_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','ozkurt');
 
-figure;  
-pcolor([7:1:13],[34:2:100],ozkurt_PAC); shading(gca,'interp');
-colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('MVL-MI');
+figure; xticks = [7:1:13];
+pcolor([7:1:13],[34:2:100],ozkurt_PAC); shading(gca,'interp'); 
+colormap(jet); colorbar;
+set(gca,'FontSize',30);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+%title('MVL-MI-ozkurt');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 %% Create comodulogram using the Tort method
 tort_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','tort');
 
-figure; 
-pcolor([7:1:13],[34:2:100],tort_PAC); shading(gca,'interp');
-colormap(jet);
-colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('KL-MI');
+figure; xticks = [7:1:13];
+pcolor([7:1:13],[34:2:100],tort_PAC); shading(gca,'interp'); 
+colormap(jet); colorbar;
+set(gca,'FontSize',30);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+%title('MVL-MI-Tort');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 
 %% Create comodulogram using the Cohen PLV method
 PLV_PAC = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','PLV');
 
-figure; 
-pcolor([7:1:13],[34:2:100],PLV_PAC); shading(gca,'interp');
-colormap(jet);
-colormap(jet); xlabel('Phase (Hz)');ylabel('Amplitude (Hz)');
-title('PLV-MI');
+figure; xticks = [7:1:13];
+pcolor([7:1:13],[34:2:100],PLV_PAC); shading(gca,'interp'); 
+colormap(jet); colorbar;
+set(gca,'FontSize',30);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+%title('MVL-MI-PLV');
 set(gca,'FontName','Arial');
-set(gca,'FontSize',30); colorbar;
 set(gca,'XTick',xticks);
 
 %% How does PAC vary with trial length?
