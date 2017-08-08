@@ -12,6 +12,8 @@
 % - diag = 'yes' or 'no' to turn on or off diagrams during computation
 % - surrogates = 'yes' or 'no' to turn on or off surrogates during computation
 % - approach = 'tort','ozkurt','canolty','PLV'
+% Optional Inputs:
+% - Number of phase bins used in KL-MI-Tort approach (default = 18)
 %
 % Outputs:
 % - MI_matrix_raw = phase amplitude comodulogram (no surrogates)
@@ -26,7 +28,15 @@
 % Written by: Robert Seymour - Aston Brain Centre. July 2017.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [MI_matrix_raw,MI_matrix_surr] = calc_MI(virtsens,toi,phase,amp,diag,surrogates,approach)
+function [MI_matrix_raw,MI_matrix_surr] = calc_MI(virtsens,toi,phase,amp,diag,surrogates,approach,varargin)
+
+% Set number of bins used for Tort
+if isempty(varargin)
+    nbin = 18;
+else
+    fprintf('Number of bins set to %s',num2str(varargin{1}))
+    nbin = varargin{1};
+end
 
 if diag == 'no'
     disp('NOT producing any images during the computation of MI')
@@ -88,7 +98,7 @@ for phase_freq = phase(1):1:phase(2)
             % Switch PAC method based on the approach
             switch approach
                 case 'tort'
-                    [MI] = calc_MI_tort(Phase,Amp);
+                    [MI] = calc_MI_tort(Phase,Amp,nbin);
                     
                 case 'ozkurt'
                     [MI] = calc_MI_ozkurt(Phase,Amp);
@@ -183,10 +193,10 @@ end
 % PAC SUB-FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    function [MI] = calc_MI_tort(Phase,Amp)
+    function [MI] = calc_MI_tort(Phase,Amp,nbin)
         
         % Apply Tort et al (2010) approach)
-        nbin=18; % % we are breaking 0-360o in 18 bins, ie, each bin has 20o
+        %nbin=18; % % we are breaking 0-360o in 18 bins, ie, each bin has 20o
         position=zeros(1,nbin); % this variable will get the beginning (not the center) of each bin 
         % (in rads)
         winsize = 2*pi/nbin;
