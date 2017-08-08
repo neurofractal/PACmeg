@@ -13,6 +13,9 @@
 %
 % Written by: Robert Seymour, June 2017
 %
+% Please note that these scripts have been optimised for the Windows
+% operating system and MATLAB versions about 2014b.
+%
 % Runtime: 10-15 minutes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,11 +40,14 @@ for i = 1:length(subject)
     
     % cd to the right place and load the V1 virtual electrode    
     load([scripts_dir '\' subject{i} '\VE_V1.mat']);
+    load([scripts_dir '\' subject{i} '\data_clean_noICA.mat']);
+    VE_V1.sampleinfo = data_clean_noICA.sampleinfo;
     
     % Calculate Power in Grating & Baseline Periods
     cfg = [];
     cfg.method = 'mtmconvol';
     cfg.output = 'pow';
+    cfg.pad = 'nextpow2';
     cfg.foi = 1:1:100; %1-100Hz
     cfg.toi = 0.3:0.02:1.5; %300-1200ms period
     cfg.t_ftimwin    = ones(length(cfg.foi),1).*0.5;
@@ -53,7 +59,7 @@ for i = 1:length(subject)
     % Calculate % change by averaging over time
     perc_change = (squeeze(mean(multitaper_post.powspctrm,3))...
         -  squeeze(mean(multitaper_pre.powspctrm,3)));
-    perc_change(:,:) = perc_change(:,:)./squeeze(mean(multitaper_pre.powspctrm,3))
+    perc_change(:,:) = perc_change(:,:)./squeeze(mean(multitaper_pre.powspctrm,3));
     perc_change(:,:) = perc_change(:,:)*100;
     
     % Add to array outside the loop

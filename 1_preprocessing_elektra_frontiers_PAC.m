@@ -15,6 +15,9 @@
 %
 % Written by Robert Seymour - May 2017
 %
+% Please note that these scripts have been optimised for the Windows
+% operating system and MATLAB versions about 2014b.
+%
 % Runnng time: 15 minutes (requires user to manually inspect trial
 % variances and enter the bad trial numbers - see bad_trial_indices.tsv)
 %
@@ -51,6 +54,7 @@ for i = 1:length(subject)
     % Epoch the whole dataset into one continous dataset and apply
     % the appropriate filters
     cfg = [];
+    cfg.trialfun = 'ft_trialfun_general';
     cfg.headerfile = rawfile;
     cfg.datafile = rawfile;
     cfg.channel = 'MEG';
@@ -80,6 +84,7 @@ for i = 1:length(subject)
     
     % Epoch your filtered data based on a specific trigger
     cfg = [];
+    cfg.trialfun = 'ft_trialfun_general';
     cfg.headerfile = rawfile;
     cfg.datafile = rawfile;
     cfg.channel = 'MEG';

@@ -11,9 +11,15 @@
 %
 % A grandaverage is computed for each frequency band and exported to .nii
 % and .gii formats. Please use your favorite MRI visualisation software to
-% view these whole-brain % power change maps.
+% view these whole-brain % power change maps. Examples include: BrainNet
+% Viewer (https://www.nitrc.org/projects/bnv/); MRIcron 
+% (http://people.cas.sc.edu/rorden/mricron/index.html) and Connectome
+% Workbench (http://www.humanconnectome.org/software/connectome-workbench).
 %
 % Written by Robert Seymour June 2017
+%
+% Please note that these scripts have been optimised for the Windows
+% operating system and MATLAB versions about 2014b.
 %
 % Running Time: 15-20 mins per frequency band
 %
@@ -102,7 +108,7 @@ for i=1:length(subject)
     %% Bandpass Filter 
     cfg = [];
     cfg.channel = chans_included; 
-    cfg.bpfilter = 'yes'
+    cfg.bpfilter = 'yes';
     cfg.bpfreq = [40 60];    %band-pass filter in the required range
     data_filtered = ft_preprocessing(cfg,data_clean_noICA)
     
@@ -123,6 +129,7 @@ for i=1:length(subject)
     % Time lock analysis for datapre and datapost period
     cfg = [];
     cfg.covariance='yes';
+    cfg.covariancewindow = [-1.5 1.5];
     avgpre = ft_timelockanalysis(cfg,datapre);
     avgpst = ft_timelockanalysis(cfg,datapost);
 
@@ -138,7 +145,7 @@ for i=1:length(subject)
     
     %% Create leadfields
     cfg=[];
-    cfg.vol=headmodel;
+    cfg.headmodel=headmodel;
     cfg.channel= chans_included;
     cfg.grid.pos= sourcespace.pos;
     cfg.grid.unit      ='m';
@@ -169,7 +176,7 @@ for i=1:length(subject)
     cfg.lcmv.fixedori = 'yes';
     cfg.lcmv.keepfilter = 'yes';
     cfg.lcmv.projectmom = 'no';
-    cfg.normalize = 'yes';
+    cfg.lcmv.normalize = 'yes';
     sourceavg=ft_sourceanalysis(cfg, avg);
     
     % use common filter for subsequent source analysis
@@ -343,6 +350,7 @@ for i=1:length(subject)
     % Time lock analysis for datapre and datapost period
     cfg = [];
     cfg.covariance='yes';
+    cfg.covariancewindow = [-1.5 1.5]
     avgpre = ft_timelockanalysis(cfg,datapre);
     avgpst = ft_timelockanalysis(cfg,datapost);
 
@@ -358,7 +366,7 @@ for i=1:length(subject)
     
     %% Create leadfields
     cfg=[];
-    cfg.vol=headmodel;
+    cfg.headmodel=headmodel;
     cfg.channel= chans_included;
     cfg.grid.pos= sourcespace.pos;
     cfg.grid.unit      ='m';
@@ -389,7 +397,7 @@ for i=1:length(subject)
     cfg.lcmv.fixedori = 'yes';
     cfg.lcmv.keepfilter = 'yes';
     cfg.lcmv.projectmom = 'no';
-    cfg.normalize = 'yes';
+    cfg.lcmv.normalize = 'yes';
     sourceavg=ft_sourceanalysis(cfg, avg);
     
     % use common filter for subsequent source analysis
