@@ -64,9 +64,9 @@ for phase = 7:13
     % Use check_non_sinusoidal_rise_decay function for grating and baseline
     % periods
     [ratios_post_grating,time_to_decay_all,time_to_peak_all] = ...
-        check_non_sinusoidal_rise_decay(VE_V1,[0.3 1.5],phase);
+        check_non_sinusoidal_rise_decay(VE_V1_concat,[0.3 1.5],phase);
     [ratios_pre_grating,time_to_decay_all,time_to_peak_all] = ...
-        check_non_sinusoidal_rise_decay(VE_V1,[-1.5 -0.3],phase);
+        check_non_sinusoidal_rise_decay(VE_V1_concat,[-1.5 -0.3],phase);
     
     % Create two overalapping histograms and add to subplot
     subplot(2,4,count); histogram(ratios_post_grating); hold on; 
