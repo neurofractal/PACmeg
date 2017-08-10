@@ -166,3 +166,44 @@ xlabel('Trial Length (s)');ylabel('MI Value');
 set(gca,'FontName','Arial');
 set(gca,'FontSize',30);
 set(gca,'XTick',xticks);
+
+%% How does number of bins affect the MI-KL-Tort approach?
+
+tort_PAC_9_bins = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','tort',9);
+tort_PAC_18_bins = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','tort',18);
+tort_PAC_36_bins = calc_MI(VE_PAC,[0.3 1.5],[7 13],[34 100],'no','no','tort',36);
+
+% Plot results
+figure; xticks = [7:1:13]; subplot(1,3,1);
+pcolor([7:1:13],[34:2:100],tort_PAC_9_bins); shading(gca,'interp'); 
+colormap(jet); colorbar;
+set(gca,'FontSize',15);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+title('9 Bins');
+set(gca,'FontName','Arial');
+set(gca,'XTick',xticks);
+
+subplot(1,3,2);
+pcolor([7:1:13],[34:2:100],tort_PAC_18_bins); shading(gca,'interp'); 
+colormap(jet); colorbar;
+set(gca,'FontSize',15);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+title('18 Bins');
+set(gca,'FontName','Arial');
+set(gca,'XTick',xticks);
+
+subplot(1,3,3);
+pcolor([7:1:13],[34:2:100],tort_PAC_36_bins); shading(gca,'interp'); 
+colormap(jet); colorbar;
+set(gca,'FontSize',15);
+xlabel('Phase Frequency (Hz)','FontSize',25);ylabel('Amplitude Frequency (Hz)','FontSize',25);
+title('36 Bins');
+set(gca,'FontName','Arial');
+set(gca,'XTick',xticks);
+set(gcf,'Position',[6 558 1908 420])
+
+
+
+
+
+
