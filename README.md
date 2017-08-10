@@ -27,6 +27,8 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
     'sub-15','sub-16'};
 ```
 
+Fieldtrip version 20161024 was used during data analysis, and can be downloaded from the /fieldtrip folder.
+
 ## Analysis should be performed in the following order:
 
 * [1_preprocessing_elektra_frontiers_PAC.m](https://github.com/neurofractal/sensory_PAC/blob/master/1_preprocessing_elektra_frontiers_PAC.m) = this script performs simple preprocessing steps and removes bad trials
