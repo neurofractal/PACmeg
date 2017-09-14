@@ -8,9 +8,9 @@ Written and maintained by **[Robert Seymour](http://robertseymour.me)**, June 20
 
 ## Manuscript & Citation
 
-**Seymour, R. A., Rippon, G., & Kessler, K. (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. bioRxiv. https://doi.org/10.1101/163006**
+**Seymour, R. A., Rippon, G., & Kessler, K. (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. Frontiers in Neuroscience 11, 487. https://doi.org/10.3389/fnins.2017.00487**
 
-The pre-print of the manuscript is available to download on [Biorxiv](https://doi.org/10.1101/163006). 
+The pre-print of the manuscript is available to download on [Biorxiv](https://doi.org/10.1101/163006), and the published manuscript is available to download on the [Frontiers website](https://doi.org/10.3389/fnins.2017.00487).
 
 ## Data Sharing
 
@@ -27,7 +27,7 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
     'sub-15','sub-16'};
 ```
 
-Fieldtrip version 20161024 was used during data analysis, and can be downloaded from the /fieldtrip folder.
+Fieldtrip version 20161024 was used during data analysis, and can be found from the /fieldtrip folder.
 
 ## Analysis should be performed in the following order:
 
@@ -51,6 +51,8 @@ The calc_MI function can be used in isolation, for data arranged in a Fieldtrip 
 
 * **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/functions/calc_MI.m)**
 
+Please note: This function is still under-development, but will be back-compatible with data presented within the manuscript.
+
 ```matlab
 
 function [MI_matrix_raw,MI_matrix_surr] = calc_MI(virtsens,toi,phase,amp,diag,surrogates,approach)
@@ -63,10 +65,13 @@ function [MI_matrix_raw,MI_matrix_surr] = calc_MI(virtsens,toi,phase,amp,diag,su
 % - diag = 'yes' or 'no' to turn on or off diagrams during computation
 % - surrogates = 'yes' or 'no' to turn on or off surrogates during computation
 % - approach = 'tort','ozkurt','canolty','PLV'
+% Optional Inputs:
+% - Number of phase bins used in KL-MI-Tort approach (default = 18)
 %
 % Outputs:
 % - MI_matrix_raw = phase amplitude comodulogram (no surrogates)
 % - MI_matrix_surr = = phase amplitude comodulogram (with surrogates)
+%
 ```
 
 Currently the function only accepts data from a **single** channel which could be obtained using an atlas-based approach (e.g. AAL atlas or HCP-MMP 1.0).
@@ -85,7 +90,7 @@ Example use:
 
 ```
 
-However, please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).
+Please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).
 
 ---
 
