@@ -55,19 +55,21 @@ row1 = 1;
 row2 = 1;
 
 for phase_freq = phase(1):1:phase(2)
+    % Filter data at phase frequency using Butterworth filter
+    cfg = [];
+    cfg.showcallinfo = 'no';
+    cfg.bpfilter = 'yes';
+    cfg.bpfreq = [phase_freq-1 phase_freq+1]; %+-1Hz - could be changed if necessary
+    cfg.hilbert = 'angle';
+    cfg.padding = 1 + size(virtsens.trial{1},2)/virtsens.fsample; % 1 sec. padding to avoid edge effects
+    cfg.padtype = 'mirror';
+    [virtsens_phase] = ft_preprocessing(cfg, virtsens);
+    
     for amp_freq = amp(1):2:amp(2)
         %% Bandpass filter individual trials using a two-way Butterworth Filter
         
         % Specifiy bandwith = +- 2.5 * center frequency
         Af1 = round(amp_freq -(amp_freq/2.5)); Af2 = round(amp_freq +(amp_freq/2.5));
-        
-        % Filter data at phase frequency using Butterworth filter
-        cfg = [];
-        cfg.showcallinfo = 'no';
-        cfg.bpfilter = 'yes';
-        cfg.bpfreq = [phase_freq-1 phase_freq+1]; %+-1Hz - could be changed if necessary
-        cfg.hilbert = 'angle';
-        [virtsens_phase] = ft_preprocessing(cfg, virtsens);
         
         % Filter data at amp frequency using Butterworth filter
         cfg = [];
@@ -75,6 +77,8 @@ for phase_freq = phase(1):1:phase(2)
         cfg.bpfilter = 'yes';
         cfg.bpfreq = [Af1 Af2];
         cfg.hilbert = 'abs';
+        cfg.padding = 1 + size(virtsens.trial{1},2)/virtsens.fsample; % 1 sec. padding to avoid edge effects
+        cfg.padtype = 'mirror';
         [virtsens_amp] = ft_preprocessing(cfg, virtsens);
         
         % Cut out window of interest - should exlude phase-locked
