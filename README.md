@@ -1,10 +1,10 @@
-# sensory_PAC
+# PACmeg
 
 MATLAB scripts for detecting and validating **phase amplitude coupling (PAC)** in electrophysiological data.
 
 Written and maintained by **[Robert Seymour](http://robertseymour.me)**, June 2017.
 
-![sensory_PAC](https://github.com/neurofractal/sensory_PAC/blob/master/figures_and_results/PAC_figure4-1.jpg)
+![PACmeg](https://github.com/neurofractal/PACmeg/blob/master/figures_and_results/PAC_figure4-1.jpg)
 
 ## Manuscript & Citation
 
@@ -31,25 +31,25 @@ Fieldtrip version 20161024 was used during data analysis, and can be found from 
 
 ## Analysis should be performed in the following order:
 
-* [1_preprocessing_elektra_frontiers_PAC.m](https://github.com/neurofractal/sensory_PAC/blob/master/1_preprocessing_elektra_frontiers_PAC.m) = this script performs simple preprocessing steps and removes bad trials
+* [1_preprocessing_elektra_frontiers_PAC.m](https://github.com/neurofractal/PACmeg/blob/master/1_preprocessing_elektra_frontiers_PAC.m) = this script performs simple preprocessing steps and removes bad trials
 
-* [2_get_source_power.m](https://github.com/neurofractal/sensory_PAC/blob/master/2_get_source_power.m) = this script performs source analysis in the gamma (40-60Hz) and alpha (8-13Hz) bands.
+* [2_get_source_power.m](https://github.com/neurofractal/PACmeg/blob/master/2_get_source_power.m) = this script performs source analysis in the gamma (40-60Hz) and alpha (8-13Hz) bands.
 
-* [3_get_VE_frontiers_PAC.m](https://github.com/neurofractal/sensory_PAC/blob/master/3_get_VE_frontiers_PAC.m) = this script computes a V1 virtual electrode, using the HCP-MMP-1.0 atlas. Other atlases could easy be used (e.g. the AAL atlas).
+* [3_get_VE_frontiers_PAC.m](https://github.com/neurofractal/PACmeg/blob/master/3_get_VE_frontiers_PAC.m) = this script computes a V1 virtual electrode, using the HCP-MMP-1.0 atlas. Other atlases could easy be used (e.g. the AAL atlas).
 
-* [4_calc_pow_change.m](https://github.com/neurofractal/sensory_PAC/blob/master/4_calc_pow_change.m) = this script calculates the change in oscillatory power (1-100Hz) using the V1 virtual electrode.
+* [4_calc_pow_change.m](https://github.com/neurofractal/PACmeg/blob/master/4_calc_pow_change.m) = this script calculates the change in oscillatory power (1-100Hz) using the V1 virtual electrode.
 
-* [5_visual_PAC_four_methods.m](https://github.com/neurofractal/sensory_PAC/blob/master/5_visual_PAC_four_methods.m) = this script uses 4 different methods to quantify alpha-gamma PAC. Non-parametric statistics are then applied to determine changes in PAC between baseline and grating periods.
+* [5_visual_PAC_four_methods.m](https://github.com/neurofractal/PACmeg/blob/master/5_visual_PAC_four_methods.m) = this script uses 4 different methods to quantify alpha-gamma PAC. Non-parametric statistics are then applied to determine changes in PAC between baseline and grating periods.
 
-* [6_check_non_sinusoidal.m](https://github.com/neurofractal/sensory_PAC/blob/master/6_check_non_sinusoidal.m) = this script checks the low-frequency phase for differences in non-sinusoidal oscillations.
+* [6_check_non_sinusoidal.m](https://github.com/neurofractal/PACmeg/blob/master/6_check_non_sinusoidal.m) = this script checks the low-frequency phase for differences in non-sinusoidal oscillations.
 
-* [7_simulated_PAC_analysis.m](https://github.com/neurofractal/sensory_PAC/blob/master/7_simulated_PAC_analysis.m) = this script simulates PAC, checks for the detection of this coupling using three approaches, and investigates how much data is needed for reliable PAC estimates.
+* [7_simulated_PAC_analysis.m](https://github.com/neurofractal/PACmeg/blob/master/7_simulated_PAC_analysis.m) = this script simulates PAC, checks for the detection of this coupling using three approaches, and investigates how much data is needed for reliable PAC estimates.
 
 ## PAC Function
 
 The calc_MI function can be used in isolation, for data arranged in a Fieldtrip structure: 
 
-* **[calc_MI](https://github.com/neurofractal/sensory_PAC/blob/master/functions/calc_MI.m)**
+* **[calc_MI](https://github.com/neurofractal/PACmeg/blob/master/functions/calc_MI.m)**
 
 Please note: This function is still under-development, but will be back-compatible with data presented within the manuscript.
 
