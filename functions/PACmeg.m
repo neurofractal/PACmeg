@@ -1,5 +1,27 @@
 function [MI_matrix_raw] = PACmeg(cfg,data)
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACmeg: a function to do PAC
+%
+% Author: Robert Seymour (robert.seymour@mq.edu.au)
+%
+%%%%%%%%%%%
+% Inputs:
+%%%%%%%%%%%
+%
+% - data            = data for PAC (2D matrix)
+% cfg.Fs            = Sampling frequency (in Hz)
+% cfg.phase_freqs   = Phase Frequencies in Hz (e.g. [8:1:13])
+% cfg.amp_freqs     = Amplitude Frequencies in Hz (e.g. [40:2:100])
+% cfg.method        = Method for PAC Computation:
+%                   ('Tort','Ozkurt','PLV','Canolty)
+%
+%%%%%%%%%%%
+% Outputs:
+%%%%%%%%%%%
+%
+% - output_1    = ...
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get function inputs
 % Get sampling frequency
 Fs = ft_getopt(cfg,'Fs',[]);
