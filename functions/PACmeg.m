@@ -1,4 +1,4 @@
-function [MI_matrix_raw] = PACmeg(cfg,data)
+function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PACmeg: a function to do PAC
 %
@@ -54,6 +54,10 @@ amp_bandw = ft_getopt(cfg,'amp_bandw',10);
 % Get PAC Method
 method = ft_getopt(cfg,'method','tort');
 fprintf('Using the %s method for PAC computation\n',method);
+
+% Get surrogate method & number of iterations
+surr_method = ft_getopt(cfg,'surr_method',[]);
+surr_N = ft_getopt(cfg,'surr_N',200);
 
 %% Check inputs
 
@@ -170,6 +174,33 @@ for amp = 1:length(amp_freqs)
     clear filt Af1 Af2
 end
 
+%% Compute Surrogates
+if ~isempty(surr_method)
+    % Switch based on the surrogate methods
+    switch surr_method
+        case 'swap_blocks'
+            
+            % Get random points to segment
+            surr_data_rand = randi([size(amp_filtered,2)./10 ...
+                size(amp_filtered,2)], size(amp_filtered,1), surr_N);
+            
+            % Create matrix of zeros
+            surr_data = zeros(surr_N,size(amp_filtered,1),...
+                size(amp_filtered,2));
+            
+            disp('Computing surrogate data...');
+            for surr = 1:surr_N
+                for amp = 1:size(amp_filtered,1)
+                    
+                    % Split data
+                    seg1 = amp_filtered(amp,surr_data_rand(amp,surr):end);
+                    seg2 = amp_filtered(amp,1:surr_data_rand(amp,surr)-1);
+                    
+                    surr_data(surr,amp,:) = [seg1 seg2];
+                end
+            end
+    end
+end
 
 %% PAC computation
 MI_matrix_raw = zeros(length(amp_freqs),length(phase_freqs));
@@ -202,5 +233,50 @@ for phase = 1:length(phase_freqs)
     end
 end
 
+%% Perform surrogate PAC Analysis
+if ~isempty(surr_method)
+    
+    % Matrix to hold surrogates
+    MI_matrix_surr = zeros(surr_N,length(amp_freqs),length(phase_freqs));
+    
+    % Length of amplitudes
+    len_of_amp = size(amp_filtered,2);
+
+    % Start surrogate loop
+    ft_progress('init', 'text',    'Please wait...')
+    for surr = 1:surr_N
+        ft_progress(surr/surr_N, 'Surrogate %d of %d', surr, surr_N)  % show string, x=i/N
+        
+        for phase = 1:length(phase_freqs)
+            for amp = 1:length(amp_freqs)
+                
+                % Switch based on the method of PAC computation
+                switch method
+                    case 'tort'
+                        [MI] = calc_MI_tort(phase_filtered(phase,:),...
+                            reshape(surr_data(surr,amp,:),[1 len_of_amp]),18);
+                        
+                    case 'ozkurt'
+                        [MI] = calc_MI_ozkurt(phase_filtered(phase,:),...
+                            reshape(surr_data(surr,amp,:),[1 len_of_amp]));
+                        
+                    case 'PLV'
+                        [MI] = cohen_PLV(phase_filtered(phase,:),...
+                            reshape(surr_data(surr,amp,:),[1 len_of_amp]));
+                        
+                    case 'canolty'
+                        [MI] = calc_MI_canolty(phase_filtered(phase,:),...
+                            reshape(surr_data(surr,amp,:),[1 len_of_amp]));
+                        
+                end
+                
+                % Add to matrix outside the loop
+                MI_matrix_surr(surr,amp,phase) = MI;
+            end
+        end
+    end
+ft_progress('close')
+    
+    
 end
 
