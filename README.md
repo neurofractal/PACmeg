@@ -2,17 +2,89 @@
 
 MATLAB scripts for detecting and validating **phase amplitude coupling (PAC)** in electrophysiological data.
 
-Written and maintained by **[Robert Seymour](http://robertseymour.me)**, June 2017.
+Written and maintained by **[Robert Seymour](http://neurofractal.github.io)**, June 2017 - October 2019.
 
 ![PACmeg](https://github.com/neurofractal/PACmeg/blob/master/figures_and_results/PAC_figure4-1.jpg)
 
 ## Manuscript & Citation
 
+If you use these scripts, please cite:
+
 **Seymour, R. A., Rippon, G., & Kessler, K. (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. Frontiers in Neuroscience 11, 487. https://doi.org/10.3389/fnins.2017.00487**
 
-The pre-print of the manuscript is available to download on [Biorxiv](https://doi.org/10.1101/163006), and the published manuscript is available to download on the [Frontiers website](https://doi.org/10.3389/fnins.2017.00487).
+The initial pre-print of the manuscript is available to download on [Biorxiv](https://doi.org/10.1101/163006).
 
-## Data Sharing
+## PAC Function (UNDER DEVEOPMENT)
+
+The pacMEG.m function can be used in isolation (with the Fiekdtrip toolbox) for PAC computation:
+
+* **[PACmeg](https://github.com/neurofractal/PACmeg/blob/master/functions/PACmeg.m)**
+
+
+```matlab
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACmeg: a function to do PAC
+%
+% Author: Robert Seymour (robert.seymour@mq.edu.au)
+%
+%%%%%%%%%%%
+% Inputs:
+%%%%%%%%%%%
+%
+% data              = data for PAC (size: 1*time)
+% cfg.Fs            = Sampling frequency (in Hz)
+% cfg.phase_freqs   = Phase Frequencies in Hz (e.g. [8:1:13])
+% cfg.amp_freqs     = Amplitude Frequencies in Hz (e.g. [40:2:100])
+% cfg.filt_order    = Filter order used by ft_preproc_bandpassfilter
+%
+% cfg.method        = Method for PAC Computation:
+%                   ('Tort','Ozkurt','PLV','Canolty)
+% 
+% cfg.surr_method   = Method to compute surrogates ('[], swap_blocks')
+% cfg.surr_N        = Number of iterations to use for surrogate analysis
+%
+%
+%%%%%%%%%%%
+% Outputs:
+%%%%%%%%%%%
+%
+% - MI_matrix_raw   = comodulagram matrix (size: amp*phase)
+% - MI_matrix_surr  = surrogate comodulagram matrix (size: surr*amp*phase)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+```
+
+Currently the function only accepts data from a **single** channel which could be obtained using an atlas-based approach (e.g. AAL atlas or HCP-MMP 1.0).
+
+The PAC algorithms from Tort et al., (2010), Ozkurt & Schnitzler (2011), Canolty et al., (2006) and Cohen (2008) are implemented. Additional implementations are planned
+Example use:
+
+```matlab
+
+% To produce a PAC comodulogram on a single channel using the 
+% Tort et al., (2010) approach, between 2-10Hz phase and 
+% 30-100Hz amplitude, with 200 surrogates:
+
+cfg                     = [];
+cfg.Fs                  = 1000;
+cfg.phase_freqs         = [2:1:10];
+cfg.amp_freqs           = [30:2:100];
+cfg.method              = 'tort';
+cfg.filt_order          = 3;
+cfg.surr_method         = 'swap_blocks';
+cfg.surr_N              = 200;
+cfg.amp_bandw_method    = 'number';
+cfg.amp_bandw           = 16;
+
+[MI_raw,MI_surr]        = PACmeg(cfg,signal);
+```
+
+**Please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).**
+
+
+For more information/queries please raise an ISSUE within Github or email me: robert.seymour@mq.edu.au . I am also very keen for collaborations to help improve and expand this code.
+
+## Data Sharing (Seymour et al., 2017)
 
 Please download the MEG and anatomical data from [Figshare](https://figshare.com/collections/The_Detection_of_Phase_Amplitude_Coupling_During_Sensory_Processing/3819106).
 
@@ -29,7 +101,7 @@ subject = {'sub-01','sub-02','sub-03','sub-04','sub-05','sub-06','sub-07',...
 
 Fieldtrip version 20161024 was used during data analysis, and can be found from the /fieldtrip folder.
 
-## Analysis should be performed in the following order:
+## Analysis for reproducing Seymour et al., (2017)
 
 * [1_preprocessing_elektra_frontiers_PAC.m](https://github.com/neurofractal/PACmeg/blob/master/1_preprocessing_elektra_frontiers_PAC.m) = this script performs simple preprocessing steps and removes bad trials
 
@@ -45,53 +117,5 @@ Fieldtrip version 20161024 was used during data analysis, and can be found from 
 
 * [7_simulated_PAC_analysis.m](https://github.com/neurofractal/PACmeg/blob/master/7_simulated_PAC_analysis.m) = this script simulates PAC, checks for the detection of this coupling using three approaches, and investigates how much data is needed for reliable PAC estimates.
 
-## PAC Function
-
-The calc_MI function can be used in isolation, for data arranged in a Fieldtrip structure: 
-
-* **[calc_MI](https://github.com/neurofractal/PACmeg/blob/master/functions/calc_MI.m)**
-
-Please note: This function is still under-development, but will be back-compatible with data presented within the manuscript.
-
-```matlab
-
-function [MI_matrix_raw,MI_matrix_surr] = calc_MI(virtsens,toi,phase,amp,diag,surrogates,approach)
-
-% Inputs:
-% - virtsens = MEG data (1 channel)
-% - toi = times of interest in seconds e.g. [0.3 1.5]
-% - phases of interest e.g. [4 22] currently increasing in 1Hz steps
-% - amplitudes of interest e.g. [30 80] currently increasing in 2Hz steps
-% - diag = 'yes' or 'no' to turn on or off diagrams during computation
-% - surrogates = 'yes' or 'no' to turn on or off surrogates during computation
-% - approach = 'tort','ozkurt','canolty','PLV'
-% Optional Inputs:
-% - Number of phase bins used in KL-MI-Tort approach (default = 18)
-%
-% Outputs:
-% - MI_matrix_raw = phase amplitude comodulogram (no surrogates)
-% - MI_matrix_surr = = phase amplitude comodulogram (with surrogates)
-%
-```
-
-Currently the function only accepts data from a **single** channel which could be obtained using an atlas-based approach (e.g. AAL atlas or HCP-MMP 1.0).
-
-The PAC algorithms from Tort et al., (2010), Ozkurt & Schnitzler (2011), Canolty et al., (2006) and Cohen (2008) are implemented, and more will be added soon.
-
-Example use:
-
-```matlab
-
-% To produce a PAC comodulogram on a single channel using the 
-% Tort et al., (2010) approach, 0.3-1.5s post-stimulus onset between
-% 7-13Hz phase and 34-100Hz amplitude, normalised by surrogate data:
-
-[MI_matrix] = calc_MI(VE_V1,[0.3 1.5],[7 13],[34 100],'no','yes','tort')
-
-```
-
-Please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).
-
 ---
 
-For more information/queries please raise an ISSUE within Github or email me: robbyseymour [at] gmail.com . I am also very keen for collaborations to help improve and expand this code.
