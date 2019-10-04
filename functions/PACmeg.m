@@ -8,20 +8,25 @@ function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 % Inputs:
 %%%%%%%%%%%
 %
-% - data            = data for PAC (2D matrix)
+% data              = data for PAC (size: 1*time)
 % cfg.Fs            = Sampling frequency (in Hz)
 % cfg.phase_freqs   = Phase Frequencies in Hz (e.g. [8:1:13])
 % cfg.amp_freqs     = Amplitude Frequencies in Hz (e.g. [40:2:100])
 % cfg.filt_order    = Filter order used by ft_preproc_bandpassfilter
-
+%
 % cfg.method        = Method for PAC Computation:
 %                   ('Tort','Ozkurt','PLV','Canolty)
+% 
+% cfg.surr_method   = Method to compute surrogates ('[], swap_blocks')
+% cfg.surr_N        = Number of iterations to use for surrogate analysis
+%
 %
 %%%%%%%%%%%
 % Outputs:
 %%%%%%%%%%%
 %
-% - output_1    = ...
+% - MI_matrix_raw   = comodulagram matrix (size: amp*phase)
+% - MI_matrix_surr  = surrogate comodulagram matrix (size: surr*amp*phase)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get function inputs
