@@ -16,9 +16,11 @@ function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 %
 % cfg.method        = Method for PAC Computation:
 %                   ('Tort','Ozkurt','PLV','Canolty)
-% 
+%
 % cfg.surr_method   = Method to compute surrogates ('[], swap_blocks')
 % cfg.surr_N        = Number of iterations to use for surrogate analysis
+% cfg.avg_PAC       = Average PAC over trials ('yes' or 'no')
+%
 %
 %
 %%%%%%%%%%%
@@ -60,9 +62,16 @@ amp_bandw = ft_getopt(cfg,'amp_bandw',10);
 method = ft_getopt(cfg,'method','tort');
 fprintf('Using the %s method for PAC computation\n',method);
 
+% Get Masking
+mask = ft_getopt(cfg,'mask',[]);
+fprintf('Using the %s method for PAC computation\n',method);
+
 % Get surrogate method & number of iterations
 surr_method = ft_getopt(cfg,'surr_method',[]);
 surr_N = ft_getopt(cfg,'surr_N',200);
+
+% Get option for whether to average PAC over trials
+avg_PAC = ft_getopt(cfg,'avg_PAC','yes');
 
 %% Check inputs
 
@@ -117,7 +126,13 @@ end
 %% Filter Phase Frequencies & take 'angle'
 disp('Filtering Phase...');
 
-phase_filtered = zeros(length(phase_freqs),length(data));
+if ~isempty(mask)
+    phase_filtered = zeros(size(data,1),length(phase_freqs),length(data(:,mask(1):...
+        mask(2))));
+else
+    phase_filtered = zeros(size(data,1),length(phase_freqs),length(data));
+    
+end
 
 for phase = 1:length(phase_freqs)
     try
@@ -128,14 +143,26 @@ for phase = 1:length(phase_freqs)
         error('Could not filter ... Perhaps try a lower filter order');
     end
     
-    phase_filtered(phase,:) = ft_preproc_hilbert(filt, 'angle');
+    if ~isempty(mask)
+        phase_filtered(:,phase,:) = ft_preproc_hilbert(filt(:,mask(1):...
+            mask(2)), 'angle');
+    else
+        phase_filtered(:,phase,:) = ft_preproc_hilbert(filt, 'angle');
+    end
+    
     clear filt
 end
+
 
 %% Filter Amplitude & Take 'abs'
 disp('Filtering Amplitude...');
 
-amp_filtered = zeros(length(amp_freqs),length(data));
+if ~isempty(mask)
+    amp_filtered = zeros(size(data,1),length(amp_freqs),length(data(:,mask(1):...
+        mask(2))));
+else
+    amp_filtered = zeros(size(data,1),length(amp_freqs),length(data));
+end
 
 for amp = 1:length(amp_freqs)
     
@@ -174,8 +201,15 @@ for amp = 1:length(amp_freqs)
     [filt] = ft_preproc_bandpassfilter(data, Fs,...
         [Af1 Af2],filt_order, 'but', 'twopass', 'no');
     
-    % Take abs
-    amp_filtered(amp,:) = ft_preproc_hilbert(filt, 'abs');
+    % Take abs (and mask values if required)
+    if ~isempty(mask)
+        amp_filtered(:,amp,:) = ft_preproc_hilbert(filt(:,mask(1):...
+            mask(2)), 'abs');
+    else
+        
+        amp_filtered(:,amp,:) = ft_preproc_hilbert(filt, 'abs');
+    end
+    
     clear filt Af1 Af2
 end
 
@@ -185,57 +219,139 @@ if ~isempty(surr_method)
     switch surr_method
         case 'swap_blocks'
             
-            % Get random points to segment
-            surr_data_rand = randi([size(amp_filtered,2)./10 ...
-                size(amp_filtered,2)], size(amp_filtered,1), surr_N);
+            % Create matrix of zeros for amplitude
+            %             surr_data_amp = zeros(surr_N,size(amp_filtered,2),...
+            %                 size(amp_filtered,3));
             
-            % Create matrix of zeros
-            surr_data = zeros(surr_N,size(amp_filtered,1),...
-                size(amp_filtered,2));
+            surr_data_amp = [];
+            
+            % Create matrix of zeros for phase
+            surr_data_phase = [];
+            
+            warning('NEEDS WORK');
+            
+            % Get random phase and amplitude trials for each surrogate
+            rand_phase_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
+            rand_amp_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
+            
+            %
+            find_same_trials = find(rand_amp_trial-rand_phase_trial==0);
+            rand_phase_trial(find_same_trials) = [];
+            rand_amp_trial(find_same_trials) = [];
+            
+            % Now select the correct number of surrogates
+            rand_phase_trial    = rand_phase_trial(1:surr_N);
+            rand_amp_trial      = rand_amp_trial(1:surr_N);
+            
+            % Get random points of the am to segment
+            point_to_cut = randi([1 size(amp_filtered,3)],1, surr_N);
+            
+            % Get random "trial" for each iteration
+            surr_data_rand = randi([1 size(data,1)], 1, surr_N);
             
             disp('Computing surrogate data...');
             for surr = 1:surr_N
-                for amp = 1:size(amp_filtered,1)
-                    
-                    % Split data
-                    seg1 = amp_filtered(amp,surr_data_rand(amp,surr):end);
-                    seg2 = amp_filtered(amp,1:surr_data_rand(amp,surr)-1);
-                    
-                    surr_data(surr,amp,:) = [seg1 seg2];
-                end
+                
+                % Get amplitude data for this surrogate run
+                amp_data_spare = amp_filtered(...
+                    rand_amp_trial(surr),:,:);
+                
+                % Split this data at a random point
+                x = amp_data_spare(:,:,point_to_cut(surr):end);
+                y = amp_data_spare(:,:,1:point_to_cut(surr)-1);
+                
+                % Join back together but with end portion at the start
+                amp_data_spare2 = cat(3,x,y);
+                
+                % Add amplitude data to array outside the loop
+                surr_data_amp(surr,:,:) = amp_data_spare2;
+                
+                % Add phase data to array outside the loop
+                surr_data_phase(surr,:,:) = phase_filtered(...
+                    rand_phase_trial(surr),:,:);    
+                
+                clear amp_data_spare x y amp_data_spare2
             end
+            
+        case 'shuffle_trials'
+            
+            surr_data_amp = [];
+            
+            % Create matrix of zeros for phase
+            surr_data_phase = [];
+            
+            warning('NEEDS WORK');
+            
+            % Get random phase and amplitude trials for each surrogate
+            rand_phase_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
+            rand_amp_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
+            
+            %
+            find_same_trials = find(rand_amp_trial-rand_phase_trial==0);
+            rand_phase_trial(find_same_trials) = [];
+            rand_amp_trial(find_same_trials) = [];
+            
+            % Now select the correct number of surrogates
+            rand_phase_trial    = rand_phase_trial(1:surr_N);
+            rand_amp_trial      = rand_amp_trial(1:surr_N);
+            
+            disp('Computing surrogate data...');
+            for surr = 1:surr_N
+                % Split data
+                surr_data_amp(surr,:,:) = amp_filtered(...
+                    rand_amp_trial(surr),:,:);
+                
+                surr_data_phase(surr,:,:) = phase_filtered(...
+                    rand_phase_trial(surr),:,:);
+            end
+    end
+    
+end
+
+
+
+
+%% PAC computation
+MI_matrix_raw = zeros(size(data,1),length(amp_freqs),length(phase_freqs));
+
+for trial = 1:size(data,1)
+    for phase = 1:length(phase_freqs)
+        for amp = 1:length(amp_freqs)
+            
+            phase_data = squeeze(phase_filtered(trial,phase,:));
+            amp_data = squeeze(amp_filtered(trial,amp,:));
+            
+            % Switch based on the method of PAC computation
+            switch method
+                case 'tort'
+                    [MI] = calc_MI_tort(phase_data,amp_data,18);
+                    
+                case 'ozkurt'
+                    [MI] = calc_MI_ozkurt(phase_data,amp_data);
+                    
+                case 'PLV'
+                    [MI] = cohen_PLV(phase_data,amp_data);
+                    
+                case 'canolty'
+                    [MI] = calc_MI_canolty(phase_data,amp_data);
+            end
+            
+            % Add to matrix outside the loop
+            MI_matrix_raw(trial,amp,phase) = MI;
+        end
     end
 end
 
-%% PAC computation
-MI_matrix_raw = zeros(length(amp_freqs),length(phase_freqs));
+%% Average PAC over trials if specified
 
-for phase = 1:length(phase_freqs)
-    for amp = 1:length(amp_freqs)
-        
-        % Switch based on the method of PAC computation
-        switch method
-            case 'tort'
-                [MI] = calc_MI_tort(phase_filtered(phase,:),...
-                    amp_filtered(amp,:),18);
-                
-            case 'ozkurt'
-                [MI] = calc_MI_ozkurt(phase_filtered(phase,:),...
-                    amp_filtered(amp,:));
-                
-            case 'PLV'
-                [MI] = cohen_PLV(phase_filtered(phase,:),...
-                    amp_filtered(amp,:));
-                
-            case 'canolty'
-                [MI] = calc_MI_canolty(phase_filtered(phase,:),...
-                    amp_filtered(amp,:));
-                
-        end
-        
-        % Add to matrix outside the loop
-        MI_matrix_raw(amp,phase) = MI;
-    end
+if strcmp(avg_PAC,'yes')
+    MI_matrix_raw = squeeze(mean(MI_matrix_raw));
+    
+elseif strcmp(avg_PAC,'no');
+    disp('Returning PAC values per trial');
+    
+else
+    ft_warning('Please specify cfg.avg_PAC = ''yes'' or ''no''');
 end
 
 %% Perform surrogate PAC Analysis
@@ -245,7 +361,7 @@ if ~isempty(surr_method)
     MI_matrix_surr = zeros(surr_N,length(amp_freqs),length(phase_freqs));
     
     % Length of amplitudes
-    len_of_amp = size(amp_filtered,2);
+    len_of_amp = size(amp_filtered,3);
 
     % Start surrogate loop
     ft_progress('init', 'text',    'Please wait...')
@@ -255,24 +371,23 @@ if ~isempty(surr_method)
         for phase = 1:length(phase_freqs)
             for amp = 1:length(amp_freqs)
                 
+                % Get surrogate amp & phase
+                data_phase = squeeze(surr_data_phase(surr,phase,:));
+                data_amp = squeeze(surr_data_amp(surr,amp,:));
+                
                 % Switch based on the method of PAC computation
                 switch method
                     case 'tort'
-                        [MI] = calc_MI_tort(phase_filtered(phase,:),...
-                            reshape(surr_data(surr,amp,:),[1 len_of_amp]),18);
+                        [MI] = calc_MI_tort(data_phase,data_amp,18);
                         
                     case 'ozkurt'
-                        [MI] = calc_MI_ozkurt(phase_filtered(phase,:),...
-                            reshape(surr_data(surr,amp,:),[1 len_of_amp]));
+                        [MI] = calc_MI_ozkurt(data_phase,data_amp);
                         
                     case 'PLV'
-                        [MI] = cohen_PLV(phase_filtered(phase,:),...
-                            reshape(surr_data(surr,amp,:),[1 len_of_amp]));
+                        [MI] = cohen_PLV(data_phase,data_amp);
                         
                     case 'canolty'
-                        [MI] = calc_MI_canolty(phase_filtered(phase,:),...
-                            reshape(surr_data(surr,amp,:),[1 len_of_amp]));
-                        
+                        [MI] = calc_MI_canolty(data_phase,data_amp);
                 end
                 
                 % Add to matrix outside the loop

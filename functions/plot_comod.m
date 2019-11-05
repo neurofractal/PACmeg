@@ -14,7 +14,7 @@ caxis([-max(MI_matrix_raw(:)) max(MI_matrix_raw(:))]);
 
 xticks(phase_freqs);
 yticks(min(amp_freqs):20:max(amp_freqs));
-set(gca,'FontSize',14);
-xlabel('Phase Frequencies (Hz)','FontSize',18);
-ylabel('Amplitude Frequencies (Hz)','FontSize',18);
+set(gca,'FontSize',20);
+xlabel('Phase Frequencies (Hz)','FontSize',25);
+ylabel('Amplitude Frequencies (Hz)','FontSize',25);
 end
