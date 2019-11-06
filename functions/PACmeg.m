@@ -8,20 +8,34 @@ function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 % Inputs:
 %%%%%%%%%%%
 %
-% data              = data for PAC (size: 1*time)
+% data              = data for PAC (size: trials*time)
 % cfg.Fs            = Sampling frequency (in Hz)
 % cfg.phase_freqs   = Phase Frequencies in Hz (e.g. [8:1:13])
 % cfg.amp_freqs     = Amplitude Frequencies in Hz (e.g. [40:2:100])
 % cfg.filt_order    = Filter order used by ft_preproc_bandpassfilter
 %
+% amp_bandw_method  = Method for calculating bandwidth to filter the 
+%                   ampltitude signal:
+%                        - 'number': +- nHz either side
+%                        - 'maxphase': 1.5*max(phase_freq)
+%                        - 'centre_freq': +-2.5*amp_freq
+% amp_bandw         = Bandwidth when cfg.amp_bandw_method = 'number'; 
+%
 % cfg.method        = Method for PAC Computation:
 %                   ('Tort','Ozkurt','PLV','Canolty)
 %
-% cfg.surr_method   = Method to compute surrogates ('[], swap_blocks')
-% cfg.surr_N        = Number of iterations to use for surrogate analysis
+% cfg.surr_method   = Method to compute surrogates:
+%                        - '[]': No surrogates
+%                        - 'swap_blocks': cuts each trial's amplitude at 
+%                        a random point and swaps the order around
+%                        - 'swap_trials': permutes phase and amp from
+%                        different trials
+% cfg.surr_N        = Number of iterations used for surrogate analysis
+%
+% cfg.mask          = filters ALL data but masks between times [a b]
+%                   (e.g. cfg.mask = [100 800]; will 
+%
 % cfg.avg_PAC       = Average PAC over trials ('yes' or 'no')
-%
-%
 %
 %%%%%%%%%%%
 % Outputs:
@@ -31,6 +45,13 @@ function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 % - MI_matrix_surr  = surrogate comodulagram matrix (size: surr*amp*phase)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Check if Fieldtrip is in the MATLAB path
+try
+    ft_defaults;
+catch
+    error('Add Fieldtrip to your MATLAB path');
+end
+
 %% Get function inputs
 % Get sampling frequency
 Fs = ft_getopt(cfg,'Fs',[]);
@@ -64,7 +85,6 @@ fprintf('Using the %s method for PAC computation\n',method);
 
 % Get Masking
 mask = ft_getopt(cfg,'mask',[]);
-fprintf('Using the %s method for PAC computation\n',method);
 
 % Get surrogate method & number of iterations
 surr_method = ft_getopt(cfg,'surr_method',[]);
@@ -206,7 +226,6 @@ for amp = 1:length(amp_freqs)
         amp_filtered(:,amp,:) = ft_preproc_hilbert(filt(:,mask(1):...
             mask(2)), 'abs');
     else
-        
         amp_filtered(:,amp,:) = ft_preproc_hilbert(filt, 'abs');
     end
     
@@ -219,22 +238,20 @@ if ~isempty(surr_method)
     switch surr_method
         case 'swap_blocks'
             
-            % Create matrix of zeros for amplitude
-            %             surr_data_amp = zeros(surr_N,size(amp_filtered,2),...
-            %                 size(amp_filtered,3));
-            
+            % Create matrix for amplitude
             surr_data_amp = [];
             
-            % Create matrix of zeros for phase
+            % Create matrix for phase
             surr_data_phase = [];
             
-            warning('NEEDS WORK');
+            warning('Use with caution - NEEDS WORK');
             
             % Get random phase and amplitude trials for each surrogate
             rand_phase_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
             rand_amp_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
             
-            %
+            % Remove instances where the same phase and amplitude trial has
+            % been selected
             find_same_trials = find(rand_amp_trial-rand_phase_trial==0);
             rand_phase_trial(find_same_trials) = [];
             rand_amp_trial(find_same_trials) = [];
@@ -243,11 +260,9 @@ if ~isempty(surr_method)
             rand_phase_trial    = rand_phase_trial(1:surr_N);
             rand_amp_trial      = rand_amp_trial(1:surr_N);
             
-            % Get random points of the am to segment
+            % Generate random inteegers of the ampitude timeseries 
+            % to cut at
             point_to_cut = randi([1 size(amp_filtered,3)],1, surr_N);
-            
-            % Get random "trial" for each iteration
-            surr_data_rand = randi([1 size(data,1)], 1, surr_N);
             
             disp('Computing surrogate data...');
             for surr = 1:surr_N
@@ -275,18 +290,20 @@ if ~isempty(surr_method)
             
         case 'shuffle_trials'
             
+            % Create matrix for amplitude
             surr_data_amp = [];
             
             % Create matrix of zeros for phase
             surr_data_phase = [];
             
-            warning('NEEDS WORK');
+            warning('Use with caution - NEEDS WORK');
             
             % Get random phase and amplitude trials for each surrogate
             rand_phase_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
             rand_amp_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
             
-            %
+            % Remove instances where the same phase and amplitude trial has
+            % been selected
             find_same_trials = find(rand_amp_trial-rand_phase_trial==0);
             rand_phase_trial(find_same_trials) = [];
             rand_amp_trial(find_same_trials) = [];
@@ -307,9 +324,6 @@ if ~isempty(surr_method)
     end
     
 end
-
-
-
 
 %% PAC computation
 MI_matrix_raw = zeros(size(data,1),length(amp_freqs),length(phase_freqs));
@@ -349,7 +363,6 @@ if strcmp(avg_PAC,'yes')
     
 elseif strcmp(avg_PAC,'no');
     disp('Returning PAC values per trial');
-    
 else
     ft_warning('Please specify cfg.avg_PAC = ''yes'' or ''no''');
 end
