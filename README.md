@@ -10,16 +10,19 @@ Written and maintained by **[Robert Seymour](http://neurofractal.github.io)**, J
 
 If you use these scripts, please cite:
 
-**Seymour, R. A., Rippon, G., & Kessler, K. (2017). The Detection of Phase Amplitude Coupling During Sensory Processing. Frontiers in Neuroscience 11, 487. https://doi.org/10.3389/fnins.2017.00487**
-
+```
+Seymour, R. A., Rippon, G., & Kessler, K. (2017). 
+The Detection of Phase Amplitude Coupling During Sensory Processing. 
+Frontiers in Neuroscience 11, 487. 
+https://doi.org/10.3389/fnins.2017.00487
+```
 The initial pre-print of the manuscript is available to download on [Biorxiv](https://doi.org/10.1101/163006).
 
-## PAC Function (UNDER DEVEOPMENT)
+## PAC Function
 
-The pacMEG.m function can be used in isolation (with the Fiekdtrip toolbox) for PAC computation:
+The pacMEG.m function can be used to create a phase x amplitude comodulogram, for data arranged in trial x time matrix:
 
 * **[PACmeg](https://github.com/neurofractal/PACmeg/blob/master/functions/PACmeg.m)**
-
 
 ```matlab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,18 +34,34 @@ The pacMEG.m function can be used in isolation (with the Fiekdtrip toolbox) for 
 % Inputs:
 %%%%%%%%%%%
 %
-% data              = data for PAC (size: 1*time)
+% data              = data for PAC (size: trials*time)
 % cfg.Fs            = Sampling frequency (in Hz)
 % cfg.phase_freqs   = Phase Frequencies in Hz (e.g. [8:1:13])
 % cfg.amp_freqs     = Amplitude Frequencies in Hz (e.g. [40:2:100])
 % cfg.filt_order    = Filter order used by ft_preproc_bandpassfilter
 %
+% amp_bandw_method  = Method for calculating bandwidth to filter the 
+%                   ampltitude signal:
+%                        - 'number': +- nHz either side
+%                        - 'maxphase': 1.5*max(phase_freq)
+%                        - 'centre_freq': +-2.5*amp_freq
+% amp_bandw         = Bandwidth when cfg.amp_bandw_method = 'number'; 
+%
 % cfg.method        = Method for PAC Computation:
 %                   ('Tort','Ozkurt','PLV','Canolty)
-% 
-% cfg.surr_method   = Method to compute surrogates ('[], swap_blocks')
-% cfg.surr_N        = Number of iterations to use for surrogate analysis
 %
+% cfg.surr_method   = Method to compute surrogates:
+%                        - '[]': No surrogates
+%                        - 'swap_blocks': cuts each trial's amplitude at 
+%                        a random point and swaps the order around
+%                        - 'swap_trials': permutes phase and amp from
+%                        different trials
+% cfg.surr_N        = Number of iterations used for surrogate analysis
+%
+% cfg.mask          = filters ALL data but masks between times [a b]
+%                   (e.g. cfg.mask = [100 800]; will 
+%
+% cfg.avg_PAC       = Average PAC over trials ('yes' or 'no')
 %
 %%%%%%%%%%%
 % Outputs:
