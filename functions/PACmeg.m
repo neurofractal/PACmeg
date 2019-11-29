@@ -288,7 +288,7 @@ if ~isempty(surr_method)
                 clear amp_data_spare x y amp_data_spare2
             end
             
-        case 'shuffle_trials'
+        case 'swap_trials'
             
             % Create matrix for amplitude
             surr_data_amp = [];
