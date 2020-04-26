@@ -1,8 +1,8 @@
 function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% PACmeg: a function to do PAC
+% PACmeg: a function to perform phase amplitude coupling analysis
 %
-% Author: Robert Seymour (robert.seymour@mq.edu.au)
+% Author: Robert Seymour (rob.seymour@ucl.ac.uk)
 %
 %%%%%%%%%%%
 % Inputs:
@@ -22,7 +22,7 @@ function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 % amp_bandw         = Bandwidth when cfg.amp_bandw_method = 'number'; 
 %
 % cfg.method        = Method for PAC Computation:
-%                   ('Tort','Ozkurt','PLV','Canolty)
+%                   ('tort','ozkurt','plv','canolty)
 %
 % cfg.surr_method   = Method to compute surrogates:
 %                        - '[]': No surrogates
@@ -95,7 +95,7 @@ avg_PAC = ft_getopt(cfg,'avg_PAC','yes');
 
 %% Check inputs
 
-% Check whether the inouts are numbers(!)
+% Check whether the inputs are numbers(!)
 if ~floor(phase_freqs) == phase_freqs
     error('Numeric Values ONLY for Phase');
 end
@@ -108,6 +108,11 @@ end
 if min(phase_freqs) < 7 && filt_order > 3
     ft_warning(['Think about using a lower filter order '...
         '(e.g. cfg.filt_order = 3)']);
+end
+
+% If incorrect method abort and warn  the user
+if ~any(strcmp({'tort','plv','ozkurt','canolty'},method))
+    error(['Specified PAC method ''' method ''' not supported']);
 end
 
 % Check whether PAC can be detected
@@ -343,7 +348,7 @@ for trial = 1:size(data,1)
                 case 'ozkurt'
                     [MI] = calc_MI_ozkurt(phase_data,amp_data);
                     
-                case 'PLV'
+                case 'plv'
                     [MI] = cohen_PLV(phase_data,amp_data);
                     
                 case 'canolty'
@@ -396,7 +401,7 @@ if ~isempty(surr_method)
                     case 'ozkurt'
                         [MI] = calc_MI_ozkurt(data_phase,data_amp);
                         
-                    case 'PLV'
+                    case 'plv'
                         [MI] = cohen_PLV(data_phase,data_amp);
                         
                     case 'canolty'
