@@ -2,7 +2,12 @@ function [MI_matrix_raw,MI_matrix_surr] = PACmeg(cfg,data)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PACmeg: a function to perform phase amplitude coupling analysis
 %
-% Author: Robert Seymour (rob.seymour@ucl.ac.uk)
+% Author: Robert Seymour (rob.seymour@ucl.ac.uk) April 2020
+%
+% Requirements: 
+% - MATLAB 2016b or later
+% - Fieldtrip Toolbox
+% - PACmeg
 %
 %%%%%%%%%%%
 % Inputs:
@@ -364,7 +369,7 @@ end
 %% Average PAC over trials if specified
 
 if strcmp(avg_PAC,'yes')
-    MI_matrix_raw = squeeze(mean(MI_matrix_raw));
+    MI_matrix_raw = squeeze(mean(MI_matrix_raw,1));
     
 elseif strcmp(avg_PAC,'no');
     disp('Returning PAC values per trial');

@@ -4,7 +4,7 @@ MATLAB scripts for detecting and validating **phase amplitude coupling (PAC)** i
 
 Written and maintained by **[Robert Seymour](http://neurofractal.github.io)**, June 2017 - October 2019.
 
-![PACmeg](./functions/pacmeg_logo.png)
+![PACmeg](https://github.com/neurofractal/PACmeg/blob/master/figures_and_results/PAC_figure4-1.jpg)
 
 ## Manuscript & Citation
 
@@ -74,17 +74,19 @@ The pacMEG.m function can be used to create a phase x amplitude comodulogram, fo
 
 Currently the function only accepts data from a **single** time-series which could be obtained using an atlas-based approach (e.g. AAL atlas or HCP-MMP 1.0).
 
-## Implemented PAC algorithms:
-- **[Tort et al., (2010)](https://journals.physiology.org/doi/full/10.1152/jn.00106.2010)**
-- **[Ozkurt & Schnitzler (2011)](https://www.sciencedirect.com/science/article/pii/S0165027011004730?casa_token=e2nbjg9I4DQAAAAA:A45gR6W3700DGRe7sjDM6k35c8V8RfYRlhD9Uq2-ljSs76q-UcCKQNGvBLXxk0PvX4LAkIi5)**
-- **[Canolty et al., (2006)](https://science.sciencemag.org/content/313/5793/1626)**
-- **[Cohen (2008)](https://doi.org/10.1016/j.jneumeth.2007.10.012)**
+The following PAC algorithms are implemented:
+- Tort et al., (2010)
+- Ozkurt & Schnitzler (2011)
+- Canolty et al., (2006)
+- Cohen (2008) are implemented. 
 
-## Example use:
+Additional implementations are planned
+
+### Example use:
 
 ```matlab
 
-% To produce a PAC comodulogram using the 
+% To produce a PAC comodulogram on a single channel using the 
 % Tort et al., (2010) approach, between 2-10Hz phase and 
 % 30-100Hz amplitude, with 200 surrogates:
 
@@ -102,7 +104,7 @@ cfg.amp_bandw           = 16;
 [MI_raw,MI_surr]        = PACmeg(cfg,signal);
 ```
 
-## NOTE:
+#### NOTE:
 
 **Please be aware of the various methodological pitfalls in PAC analysis before applying the scripts to your own data (see Seymour, Kessler & Rippon manuscript).**
 
