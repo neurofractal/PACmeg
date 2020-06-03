@@ -91,9 +91,10 @@ fprintf('Using the %s method for PAC computation\n',method);
 % Get Masking
 mask = ft_getopt(cfg,'mask',[]);
 
-% Get surrogate method & number of iterations
+% Get surrogate method, number of iterations and seed
 surr_method = ft_getopt(cfg,'surr_method',[]);
-surr_N = ft_getopt(cfg,'surr_N',200);
+surr_N      = ft_getopt(cfg,'surr_N',200);
+surr_seed   = ft_getopt(cfg,'surr_seed',[]);
 
 % Get option for whether to average PAC over trials
 avg_PAC = ft_getopt(cfg,'avg_PAC','yes');
@@ -309,7 +310,21 @@ if ~isempty(surr_method)
             warning('Use with caution - NEEDS WORK');
             
             % Get random phase and amplitude trials for each surrogate
+            
+            % Set seed if specified
+            if ~isempty(surr_seed)
+                rng('default');
+                rng(surr_seed(1));
+            end
+            
             rand_phase_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
+            
+            % Set seed if specified
+            if ~isempty(surr_seed)
+                rng('default');
+                rng(surr_seed(2));
+            end
+            
             rand_amp_trial = randi([1 size(data,1)], 1, surr_N.*1.5);
             
             % Remove instances where the same phase and amplitude trial has
